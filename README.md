@@ -6,9 +6,39 @@ Command line tools for Circle CI
 
     $ gem install circle-cli
 
+## Setup
+
+1. Install Circle-CLI
+
+  ```
+  $ gem install circle-cli
+  ```
+
+2. Add your GitHub token
+
+  ```
+  $ circle github-token <github-token>
+  ```
+
+3. Add your CircleCI token
+
+  ```
+  $ circle token <circle-ci-token>
+  ```
+  
 ## Usage
 
-TODO: Write usage instructions here
+- Get the CI status for the HEAD of your current branch
+
+  ```
+  $ circle status
+  ```
+  
+- Open the results page for the latest CI run
+
+  ```
+  $ circle open
+  ```
 
 ## Contributing
 
