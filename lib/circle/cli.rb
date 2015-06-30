@@ -37,10 +37,11 @@ module Circle
     def run_status
       unless last_status
         puts 'unknown'
-        exit(0)
+        exit(1)
       end
 
       puts last_status.state
+      exit(0)
     end
 
     def run_open
