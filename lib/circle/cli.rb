@@ -96,7 +96,7 @@ module Circle
     end
 
     def head
-      repository.head.target
+      repository.head.target_id
     end
 
     def repository
