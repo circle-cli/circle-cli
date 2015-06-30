@@ -37,10 +37,11 @@ module Circle
     def run_status
       unless last_status
         puts 'unknown'
-        exit(0)
+        exit(1)
       end
 
       puts last_status.state
+      exit(0)
     end
 
     def run_open
@@ -83,7 +84,7 @@ module Circle
       if origin.url =~ %r{git@github.com:(\w+/\w+)\.git}
         $1
       else
-        raise "Unsupported repo url format #{origin.url.inpect}" # TODO: support other formats, mainly https
+        raise "Unsupported repo url format #{origin.url.inspect}" # TODO: support other formats, mainly https
       end
     end
 
@@ -92,7 +93,7 @@ module Circle
     end
 
     def head
-      repository.head.target
+      repository.head.target_id
     end
 
     def repository
