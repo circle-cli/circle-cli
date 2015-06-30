@@ -35,12 +35,16 @@ module Circle
     end
 
     def run_status
-      unless last_status
-        puts 'unknown'
+      if last_status && last_status.state == 'success'
+        puts last_status.state
         exit(0)
+      elsif last_status
+        puts last_status.state
+      else
+        puts 'unknown'
       end
 
-      puts last_status.state
+      exit(1)
     end
 
     def run_open
