@@ -84,7 +84,7 @@ module Circle
       if origin.url =~ %r{git@github.com:(\w+/\w+)\.git}
         $1
       else
-        raise "Unsupported repo url format #{origin.url.inpect}" # TODO: support other formats, mainly https
+        raise "Unsupported repo url format #{origin.url.inspect}" # TODO: support other formats, mainly https
       end
     end
 
