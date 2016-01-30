@@ -25,6 +25,7 @@ module Circle
     def dispatch!(argv)
       @parser.parse!
       command, *args = argv
+      command = 'status' unless command
 
       method = "run_#{command.gsub('-', '_')}"
       if respond_to?(method)
