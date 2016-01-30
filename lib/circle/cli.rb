@@ -85,7 +85,7 @@ module Circle
     end
 
     def github_repo
-      if origin.url =~ %r{git@github.com:(\w+/\w+)\.git}
+      if origin.url =~ %r{git@github.com:(\w+/[^.]*)\.git}
         $1
       else
         raise "Unsupported repo url format #{origin.url.inspect}" # TODO: support other formats, mainly https
