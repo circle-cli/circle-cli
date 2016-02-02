@@ -31,7 +31,7 @@ Command line tools for Circle CI
 - Get the CI status for the HEAD of your current branch
 
   ```
-  $ circle status
+  $ circle
   ```
   
 - Open the results page for the latest CI run
@@ -42,8 +42,8 @@ Command line tools for Circle CI
 
 ## Contributing
 
-1. Fork it ( http://github.com/byroot/circle-cli/fork )
-2. Create your feature branch (`git checkout -b my-new-feature`)
+1. Fork it ( http://github.com/codeurge/circle-cli/fork )
+2. Create your feature branch with your initials (`git checkout -b dsk/my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
