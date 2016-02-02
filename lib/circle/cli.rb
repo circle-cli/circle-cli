@@ -27,7 +27,7 @@ module Circle
       command, *args = argv
       command = 'status' unless command
 
-      method = "run_#{command.gsub('-', '_')}"
+      method = "run_#{command.tr('-', '_')}"
       if respond_to?(method)
         send(method, *args)
       else
@@ -88,7 +88,7 @@ module Circle
       if origin.url =~ %r{git@github.com:(\w+/[^.]*)\.git}
         $1
       else
-        raise "Unsupported repo url format #{origin.url.inspect}" # TODO: support other formats, mainly https
+        raise "Unsupported repo url format #{origin.url.inspect}"
       end
     end
 
@@ -101,7 +101,7 @@ module Circle
     end
 
     def repository
-      @repository ||= Rugged::Repository.new('.') # TODO: allow to be called from a subdirectory
+      @repository ||= Rugged::Repository.new('.')
     end
 
     def github_client
@@ -114,7 +114,7 @@ module Circle
       end
     end
 
-    def github_token # TODO: github-token should probably be in a global config
+    def github_token
       repository.config['github.token'] || abort!(%{Missing GitHub token.
 You can create one here: https://github.com/settings/tokens/new
 And add it with the following command: $ circle github-token YOUR_TOKEN})
