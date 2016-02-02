@@ -1,6 +1,7 @@
 # Circle CLI
 [![Gem Version](https://badge.fury.io/rb/circle-cli.svg)](https://badge.fury.io/rb/circle-cli)
 [![CircleCI Status](https://circleci.com/gh/codeurge/circle-cli.svg?style=shield&circle-token=e24d4c43a7437111a6ee5915901017a8419ddbf4)](https://circleci.com/gh/codeurge/circle-cli)
+[![Dependency Status](https://gemnasium.com/codeurge/circle-cli.svg)](https://gemnasium.com/codeurge/circle-cli)
 [![Code Climate](https://codeclimate.com/github/codeurge/circle-cli/badges/gpa.svg)](https://codeclimate.com/github/codeurge/circle-cli)
 [![Test Coverage](https://codeclimate.com/github/codeurge/circle-cli/badges/coverage.svg)](https://codeclimate.com/github/codeurge/circle-cli/coverage)
 
