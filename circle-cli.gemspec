@@ -6,8 +6,8 @@ require 'circle/cli/version'
 Gem::Specification.new do |spec|
   spec.name          = 'circle-cli'
   spec.version       = Circle::CLI::VERSION
-  spec.authors       = ['Jean Boussier']
-  spec.email         = ['jean.boussier@gmail.com']
+  spec.authors       = ['Derek Keith', 'Jean Boussier']
+  spec.email         = ['derek@codeurge.com', 'jean.boussier@gmail.com']
   spec.summary       = %q{Command line tools for Circle CI}
   spec.description   = %q{A bunch of commands useful to deal with Circle CI without leaving your terminal.}
   spec.homepage      = ''
