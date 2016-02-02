@@ -31,7 +31,7 @@ Command line tools for Circle CI
 - Get the CI status for the HEAD of your current branch
 
   ```
-  $ circle status
+  $ circle
   ```
   
 - Open the results page for the latest CI run
