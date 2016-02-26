@@ -44,18 +44,6 @@ module Circle
         repo.config['circleci.token'] = token
       end
 
-      def circle_login_url
-        'https://circleci.com/account/api'
-      end
-
-      def no_token_message
-        <<-EOMSG
-CircleCI token hasn't been configured. Run the following command to login:
-
-  $ circle login
-        EOMSG
-      end
-
       private
 
       def repo

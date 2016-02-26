@@ -5,6 +5,8 @@ require 'circle/cli/report'
 module Circle
   module CLI
     class App < Thor
+      CIRCLE_URL = 'https://circleci.com/account/api'
+
       STATUS_COLORS = {
         green: %w(fixed success),
         yellow: %w(running retried not_run queued scheduled not_running no_tests),
@@ -17,6 +19,12 @@ module Circle
 3. Click 'Create new token'.
 4. Come back to your prompt and paste in your new token.
 5. Press enter to complete the process.
+      EOMSG
+
+      NO_TOKEN_MESSAGE = <<-EOMSG
+CircleCI token hasn't been configured. Run the following command to login:
+
+  $ circle login
       EOMSG
 
       default_task :status
@@ -61,7 +69,7 @@ module Circle
         elsif value = repo.circle_token
           say value
         else
-          say repo.no_token_message, :yellow
+          say NO_TOKEN_MESSAGE, :yellow
         end
       end
 
@@ -69,7 +77,7 @@ module Circle
       def login
         say LOGIN_HELP, :yellow
         ask set_color("\nPress [enter] to open CircleCI", :blue)
-        Launchy.open(repo.circle_login_url)
+        Launchy.open(CIRCLE_URL)
         value = ask set_color('Enter your token:', :blue)
         repo.circle_token = value
         say "\nYour token has been set to '#{value}'.", :green
