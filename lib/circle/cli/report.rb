@@ -34,6 +34,10 @@ module Circle
         @builds ||= request CircleCi::Project, :recent_builds_branch, repo.branch_name
       end
 
+      def recent_builds
+        @recent_builds ||= request CircleCi::Project, :recent_builds
+      end
+
       def latest
         builds.first
       end

@@ -25,21 +25,34 @@ module Circle
       method_option :repo, default: '.', desc: 'path to repo'
       method_option :branch, desc: 'branch name'
       def status
-        validate!
+        validate_repo!
+        validate_latest!
+        stop_time = pretty_date(report['stop_time']) || 'Still running...'
+        start_time = pretty_date(report['start_time']) || 'Not run'
+
         say "#{report['subject']}\n\n", :cyan
         color = color_for_status report['status']
-        say_report 'Build status', report['status'].to_s.capitalize, color
-        say_report 'Started at', report['start_time'], color
-        say_report 'Finished at', (report['stop_time'] || 'Still running...'), color
+        say_report 'Build status', report['status'].capitalize, color
+        say_report 'Started at', start_time, color
+        say_report 'Finished at', stop_time, color
         say_report 'Compare', report['compare'], color
         display_failures report.latest_test_results.failing
+      end
+
+      desc 'overview', 'list recent builds and their statuses for all branches'
+      method_option :repo, default: '.', desc: 'path to repo'
+      def overview
+        validate_repo!
+        abort! 'No recent builds.' if report.recent_builds.empty?
+        print_table builds_to_rows(report.recent_builds)
       end
 
       desc 'open', 'open CircleCI build'
       method_option :repo, default: '.', desc: 'path to repo'
       method_option :branch, desc: 'branch name'
       def open
-        validate!
+        validate_repo!
+        validate_latest!
         Launchy.open report['build_url']
       end
 
@@ -76,8 +89,11 @@ module Circle
         @report ||= Report.new(repo)
       end
 
-      def validate!
+      def validate_repo!
         abort! repo.errors.first unless repo.valid?
+      end
+
+      def validate_latest!
         abort! 'No CircleCI builds found.' unless report.latest
       end
 
@@ -94,6 +110,18 @@ module Circle
         end
       end
 
+      def builds_to_rows(builds)
+        builds.map do |build|
+          branch = set_color(build['branch'], :bold)
+          status_color = color_for_status(build['status'])
+          status = build['status'].tr('_', ' ').capitalize
+          status = set_color(status, status_color)
+          subject = truncate build['subject']
+          started = pretty_date(build['start_time'])
+          [branch, status, subject, started]
+        end
+      end
+
       def say_report(description, value, color)
         status = set_color description.ljust(15), :bold
         result = set_color value.to_s, color
@@ -107,6 +135,16 @@ module Circle
         print_table failures.map { |spec|
           [set_color(spec['file'], :red), spec['name']]
         }
+      end
+
+      def truncate(str, length = 50)
+        return str if str.length <= length
+        "#{str[0..50]}..."
+      end
+
+      def pretty_date(str)
+        Time.parse(str).strftime('%b %e, %-l:%M %p') if str
+      rescue ArgumentError
       end
     end
   end
