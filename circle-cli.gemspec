@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rugged', '>= 0.23'
   spec.add_dependency 'octokit'
   spec.add_dependency 'gitable'
+  spec.add_dependency 'launchy'
 
   spec.add_development_dependency 'bundler', '~> 1.5'
   spec.add_development_dependency 'rake'

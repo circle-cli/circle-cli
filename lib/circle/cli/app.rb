@@ -1,6 +1,7 @@
 require 'optparse'
 require 'octokit'
 require 'circleci'
+require 'launchy'
 
 module Circle
   module CLI
@@ -47,7 +48,7 @@ module Circle
         validate_repo!
 
         if last_status
-          open(last_status.rels[:target].href)
+          Launchy.open last_status.rels[:target].href
         else
           puts 'No CI run found'
         end
@@ -70,10 +71,6 @@ module Circle
       end
 
       private
-
-      def open(url)
-        `open '#{url}'`
-      end
 
       def last_status
         @last_status ||= github_client.statuses(repo.github, repo.head).first
