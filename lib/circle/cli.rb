@@ -3,6 +3,7 @@ require 'uri'
 require 'rugged'
 require 'octokit'
 require 'circleci'
+require 'gitable'
 
 module Circle
   class CLI
@@ -85,10 +86,12 @@ module Circle
     end
 
     def github_repo
-      if origin.url =~ %r{git@github.com:(\w+/[^.]*)\.git}
-        $1
+      uri = Gitable::URI.parse(origin.url)
+
+      if uri.github?
+        uri.path.gsub(/\.git$/, '')
       else
-        raise "Unsupported repo url format #{origin.url.inspect}"
+        abort! "Unsupported repo url format #{origin.url.inspect}"
       end
     end
 
