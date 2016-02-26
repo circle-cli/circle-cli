@@ -1,7 +1,6 @@
 require 'thor'
 require 'circle/cli/version'
 require 'circle/cli/app'
-require 'circle/cli/repo'
 
 module Circle
   module CLI

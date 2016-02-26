@@ -18,33 +18,22 @@ module Circle
       def valid?
         errors.clear
         errors << "Unsupported repo url format #{uri}" unless uri.github?
-        errors << "Couldn't locate branch" if options[:branch] && !branch
-        errors << no_github_token_message unless github_token
-
-        # The following validation is temporarily disabled
-        # errors << no_circle_token_message unless circle_token
-
+        errors << no_token_message unless circle_token
         errors.empty?
       end
 
-      def github
-        uri.path.gsub(/\.git$/, '') if uri.github?
+      def user_name
+        uri.path.split('/').first
       end
 
-      def target
-        if branch
-          branch.target_id
-        else
-          repo.head.target_id
+      def project
+        uri.project_name
+      end
+
+      def branch_name
+        options.fetch 'branch' do
+          repo.head.name.sub(/^refs\/heads\//, '')
         end
-      end
-
-      def github_token
-        repo.config['github.token']
-      end
-
-      def github_token=(token)
-        repo.config['github.token'] = token
       end
 
       def circle_token
@@ -55,12 +44,16 @@ module Circle
         repo.config['circleci.token'] = token
       end
 
-      def no_github_token_message
-        no_token_message 'Github', 'https://github.com/settings/tokens/new', 'github'
-      end
+      def no_token_message
+        <<-EOMSG
+CircleCI token hasn't been configured. You can create one here:
 
-      def no_circle_token_message
-        no_token_message 'CircleCI', 'https://circleci.com/account/api', 'ci'
+  https://circleci.com/account/api
+
+Once you have a token, add it with the following command:
+
+  $ circle token YOUR_TOKEN
+        EOMSG
       end
 
       private
@@ -69,24 +62,8 @@ module Circle
         @repo ||= Rugged::Repository.new(options[:repo])
       end
 
-      def branch
-        @branch ||= repo.branches[options[:branch]] if options[:branch]
-      end
-
       def origin
         @origin ||= repo.remotes.find { |r| r.name == 'origin' }
-      end
-
-      def no_token_message(provider, url, command)
-        <<-EOMSG
-#{provider} token hasn't been configured. You can create one here:
-
-  #{url}
-
-Once you have a token, add it with the following command:
-
-  $ circle token #{command} YOUR_TOKEN
-        EOMSG
       end
     end
   end

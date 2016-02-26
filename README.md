@@ -19,10 +19,10 @@ Command line tools for Circle CI
   $ gem install circle-cli
   ```
 
-2. Add your GitHub token
+2. Add your CircleCI token
 
   ```
-  $ circle token github <github-token>
+  $ circle token <your token>
   ```
 
 ## Usage
