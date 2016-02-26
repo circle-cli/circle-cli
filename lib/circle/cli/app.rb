@@ -1,93 +1,60 @@
-require 'optparse'
 require 'octokit'
-require 'circleci'
 require 'launchy'
+require 'circle/cli/token'
 
 module Circle
   module CLI
-    class App
-      attr_reader :repo
+    class App < Thor
+      STATUS_COLORS = {
+        'success' => :green,
+        'error' => :red,
+        'failure' => 'red',
+        'pending' => 'yellow'
+      }
 
-      def initialize
-        @options = {}
-        @repo = Repo.new
-        @parser ||= OptionParser.new do |opts|
-          # future options will go here
-        end
+      default_task :status
+
+      desc 'token', 'manage API tokens'
+      subcommand :token, Circle::CLI::Token
+
+      desc 'status', 'display CircleCI status'
+      def status
+        validate!
+        state = last_status.state
+        say last_status.description, STATUS_COLORS[state]
+        exit(state == 'success' ? 0 : 1)
       end
 
-      def dispatch!(argv)
-        @parser.parse!
-        command, *args = argv
-        command = 'status' unless command
-
-        method = "run_#{command.tr('-', '_')}"
-        if respond_to?(method)
-          send(method, *args)
-        else
-          abort("Unknown command: #{command}")
-        end
-      end
-
-      def run_status
-        validate_repo!
-
-        if last_status && last_status.state == 'success'
-          puts last_status.state
-          exit(0)
-        elsif last_status
-          puts last_status.state
-        else
-          puts 'unknown'
-        end
-
-        exit(1)
-      end
-
-      def run_open
-        validate_repo!
-
-        if last_status
-          Launchy.open last_status.rels[:target].href
-        else
-          puts 'No CI run found'
-        end
-      end
-
-      def run_token(token = nil)
-        if token
-          repo.circle_token = token
-        else
-          puts repo.circle_token
-        end
-      end
-
-      def run_github_token(token = nil)
-        if token
-          repo.github_token = token
-        else
-          puts repo.github_token
-        end
+      desc 'open', 'open CircleCI build'
+      def open
+        validate!
+        Launchy.open last_status.rels[:target].href
       end
 
       private
 
+      def repo
+        @repo ||= Repo.new
+      end
+
+      def validate!
+        abort! repo.errors.first unless repo.valid?
+        abort! 'No CI run found' unless last_status
+      end
+
       def last_status
-        @last_status ||= github_client.statuses(repo.github, repo.head).first
+        @last_status ||= begin
+          all_statuses = github_client.statuses(repo.github, repo.target)
+          all_statuses.find { |s| s.context == 'ci/circleci' }
+        end
       end
 
       def github_client
         @github_client ||= Octokit::Client.new(access_token: repo.github_token)
       end
 
-      def configure_circle_ci_client
-        CircleCi.configure do |config|
-          config.token = circle_token
-        end
-      end
-
-      def validate_repo!
-        abort repo.errors.first unless repo.valid?
+      def abort!(message)
+        abort set_color(message, :red)
       end
     end
   end

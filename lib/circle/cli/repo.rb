@@ -6,7 +6,7 @@ module Circle
     class Repo
       attr_reader :repo, :origin, :uri, :errors
 
-      def initialize
+      def initialize(options = {})
         @repo = Rugged::Repository.new('.')
         @origin = repo.remotes.find { |r| r.name == 'origin' }
         @uri = Gitable::URI.parse(@origin.url)
@@ -28,7 +28,7 @@ module Circle
         uri.path.gsub(/\.git$/, '') if uri.github?
       end
 
-      def head
+      def target
         repo.head.target_id
       end
 
@@ -48,23 +48,25 @@ module Circle
         repo.config['circleci.token'] = token
       end
 
-      private
-
       def no_github_token_message
-        no_token_message 'Github', 'https://github.com/settings/tokens/new', 'github-token'
+        no_token_message 'Github', 'https://github.com/settings/tokens/new', 'github'
       end
 
       def no_circle_token_message
-        no_token_message 'CircleCI', 'https://circleci.com/account/api', 'token'
+        no_token_message 'CircleCI', 'https://circleci.com/account/api', 'ci'
       end
+
+      private
 
       def no_token_message(provider, url, command)
         <<-EOMSG
-Missing #{provider} token. You can create one here: #{url}
+#{provider} token hasn't been configured. You can create one here:
+
+  #{url}
 
 Once you have a token, add it with the following command:
 
-  $ circle #{command} YOUR_TOKEN
+  $ circle token #{command} YOUR_TOKEN
         EOMSG
       end
     end
