@@ -4,18 +4,20 @@ require 'rugged'
 module Circle
   module CLI
     class Repo
-      attr_reader :repo, :origin, :uri, :errors
+      attr_reader :repo, :origin, :uri, :errors, :branch
 
       def initialize(options = {})
         @repo = Rugged::Repository.new('.')
         @origin = repo.remotes.find { |r| r.name == 'origin' }
         @uri = Gitable::URI.parse(@origin.url)
+        @branch = options[:branch]
         @errors = []
       end
 
       def valid?
         errors.clear
         errors << "Unsupported repo url format #{uri}" unless uri.github?
+        errors << "Couldn't locate branch" if branch && !repo.branches[branch]
         errors << no_github_token_message unless github_token
 
         # The following validation is temporarily disabled
@@ -29,7 +31,11 @@ module Circle
       end
 
       def target
-        repo.head.target_id
+        if branch
+          repo.branches[branch].target_id
+        else
+          repo.head.target_id
+        end
       end
 
       def github_token
