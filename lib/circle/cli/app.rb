@@ -11,6 +11,14 @@ module Circle
         red: %w(canceled infrastructure_fail timedout failed)
       }
 
+      LOGIN_HELP = <<-EOMSG
+1. Press [enter], and you'll be taken CircleCI.
+2. Enter a name for your new token.
+3. Click 'Create new token'.
+4. Come back to your prompt and paste in your new token.
+5. Press enter to complete the process.
+      EOMSG
+
       default_task :status
 
       desc 'status', 'show CircleCI build result'
@@ -45,6 +53,17 @@ module Circle
         else
           say repo.no_token_message, :yellow
         end
+      end
+
+      desc 'login', 'login to Circle CI'
+      method_option :repo, default: '.', desc: 'path to repo'
+      def login
+        say LOGIN_HELP, :yellow
+        ask set_color("\nPress [enter] to open CircleCI", :blue)
+        Launchy.open(repo.circle_login_url)
+        value = ask set_color('Enter your token:', :blue)
+        repo.circle_token = value
+        say "\nYour token has been set to '#{value}'.", :green
       end
 
       private
