@@ -18,7 +18,7 @@ module Circle
       def valid?
         errors.clear
         errors << "Unsupported repo url format #{uri}" unless uri.github?
-        errors << "Couldn't locate branch" if branch && !repo.branches[branch]
+        errors << "Couldn't locate branch" if options[:branch] && !branch
         errors << no_github_token_message unless github_token
 
         # The following validation is temporarily disabled
@@ -66,11 +66,11 @@ module Circle
       private
 
       def repo
-        @repo = Rugged::Repository.new(options[:repo])
+        @repo ||= Rugged::Repository.new(options[:repo])
       end
 
       def branch
-        repo.branches[options[:branch]] if options[:branch]
+        @branch ||= repo.branches[options[:branch]] if options[:branch]
       end
 
       def origin
