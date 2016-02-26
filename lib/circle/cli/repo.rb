@@ -4,14 +4,15 @@ require 'rugged'
 module Circle
   module CLI
     class Repo
-      attr_reader :repo, :origin, :uri, :errors, :branch
+      attr_reader :repo, :origin, :uri, :errors, :options
 
       def initialize(options = {})
-        @repo = Rugged::Repository.new('.')
-        @origin = repo.remotes.find { |r| r.name == 'origin' }
-        @uri = Gitable::URI.parse(@origin.url)
-        @branch = options[:branch]
+        @options = options
         @errors = []
+      end
+
+      def uri
+        Gitable::URI.parse(origin.url)
       end
 
       def valid?
@@ -32,7 +33,7 @@ module Circle
 
       def target
         if branch
-          repo.branches[branch].target_id
+          branch.target_id
         else
           repo.head.target_id
         end
@@ -63,6 +64,18 @@ module Circle
       end
 
       private
+
+      def repo
+        @repo = Rugged::Repository.new(options[:repo])
+      end
+
+      def branch
+        repo.branches[options[:branch]] if options[:branch]
+      end
+
+      def origin
+        @origin ||= repo.remotes.find { |r| r.name == 'origin' }
+      end
 
       def no_token_message(provider, url, command)
         <<-EOMSG

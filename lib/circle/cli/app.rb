@@ -18,7 +18,8 @@ module Circle
       subcommand :token, Circle::CLI::Token
 
       desc 'status', 'display CircleCI status'
-      method_option :branch
+      method_option :repo, default: '.', desc: 'path to repo'
+      method_option :branch, desc: 'branch name'
       def status
         validate!
         state = last_status.state
@@ -27,7 +28,8 @@ module Circle
       end
 
       desc 'open', 'open CircleCI build'
-      method_option :branch
+      method_option :repo, default: '.', desc: 'path to repo'
+      method_option :branch, desc: 'branch name'
       def open
         validate!
         Launchy.open last_status.rels[:target].href
@@ -36,7 +38,7 @@ module Circle
       private
 
       def repo
-        @repo ||= Repo.new(branch: options[:branch])
+        @repo ||= Repo.new(options)
       end
 
       def validate!
