@@ -94,7 +94,8 @@ CircleCI token hasn't been configured. Run the following command to login:
       end
 
       def validate_repo!
-        abort! repo.errors.first unless repo.valid?
+        abort! "Unsupported repo url format #{repo.uri}" unless repo.uri.github?
+        abort! NO_TOKEN_MESSAGE unless repo.circle_token
       end
 
       def validate_latest!

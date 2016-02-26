@@ -4,22 +4,14 @@ require 'rugged'
 module Circle
   module CLI
     class Repo
-      attr_reader :repo, :origin, :uri, :errors, :options
+      attr_reader :errors, :options
 
       def initialize(options = {})
         @options = options
-        @errors = []
       end
 
       def uri
         Gitable::URI.parse(origin.url)
-      end
-
-      def valid?
-        errors.clear
-        errors << "Unsupported repo url format #{uri}" unless uri.github?
-        errors << no_token_message unless circle_token
-        errors.empty?
       end
 
       def user_name
