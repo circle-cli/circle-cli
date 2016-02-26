@@ -22,15 +22,9 @@ Command line tools for Circle CI
 2. Add your GitHub token
 
   ```
-  $ circle github-token <github-token>
+  $ circle token github <github-token>
   ```
 
-3. Add your CircleCI token
-
-  ```
-  $ circle token <circle-ci-token>
-  ```
-  
 ## Usage
 
 - Get the CI status for the HEAD of your current branch
@@ -38,7 +32,7 @@ Command line tools for Circle CI
   ```
   $ circle
   ```
-  
+
 - Open the results page for the latest CI run
 
   ```
