@@ -76,6 +76,17 @@ CircleCI token hasn't been configured. Run the following command to login:
         say "\nA build has been triggered.", :green
       end
 
+      desc 'cancel', 'cancel most recent build'
+      method_option :branch, desc: 'branch name'
+      def cancel
+        validate_repo!
+        validate_latest!
+
+        project.cancel! unless project['outcome']
+        invoke :status
+        say "\nThe build has been cancelled.", :red unless project['outcome']
+      end
+
       desc 'token', 'view or edit CircleCI token'
       def token(value = nil)
         if value

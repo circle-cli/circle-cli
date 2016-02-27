@@ -34,6 +34,10 @@ module Circle
         request CircleCi::Project, :build_branch, repo.branch_name
       end
 
+      def cancel!
+        request CircleCi::Build, :cancel, latest['build_num']
+      end
+
       def builds
         @builds ||= request CircleCi::Project, :recent_builds_branch, repo.branch_name
       end
