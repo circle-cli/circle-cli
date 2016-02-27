@@ -23,6 +23,8 @@ module Circle
 
       def initialize(repo)
         @repo = repo
+        @test_results = {}
+        @details = {}
         configure
       end
 
@@ -54,11 +56,23 @@ module Circle
         test_results_for latest
       end
 
+      def latest_details
+        details_for latest
+      end
+
+      def details_for(build)
+        @details[build['build_num']] ||= details_for!(build)
+      end
+
       def test_results_for(build)
-        (@test_results ||= {})[build['build_num']] ||= test_results_for!(build)
+        @test_results[build['build_num']] ||= test_results_for!(build)
       end
 
       private
+
+      def details_for!(build)
+        request CircleCi::Build, :get, build['build_num']
+      end
 
       def test_results_for!(build)
         Tests.new request(CircleCi::Build, :tests, build['build_num'])['tests']

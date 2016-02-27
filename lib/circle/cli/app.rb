@@ -45,6 +45,7 @@ CircleCI token hasn't been configured. Run the following command to login:
         say_project 'Started at', start_time, color
         say_project 'Finished at', stop_time, color
         say_project 'Compare', project['compare'], color if project['compare']
+        display_steps project.latest_details['steps']
 
         unless failures.empty?
           display_failures failures
@@ -152,6 +153,19 @@ CircleCI token hasn't been configured. Run the following command to login:
         end
       end
 
+      def display_steps(steps)
+        return if steps.empty?
+        say "\nSteps:", :bold
+
+        print_table steps.map { |step|
+          action = step['actions'].first
+          color = color_for_status action['status']
+          millis = action['run_time_millis']
+          runtime = human_duration(millis) if millis
+          [set_color(step['name'], color), runtime]
+        }
+      end
+
       def say_project(description, value, color)
         status = set_color description.ljust(15), :bold
         result = set_color value.to_s, color
@@ -174,6 +188,19 @@ CircleCI token hasn't been configured. Run the following command to login:
       def pretty_date(str)
         Time.parse(str).strftime('%b %e, %-l:%M %p') if str
       rescue ArgumentError
+      end
+
+      def human_duration(ms)
+        hours = (ms / (1000 * 60 * 60)) % 24
+        minutes = (ms / (1000 * 60)) % 60
+        seconds = (ms / 1000) % 60
+
+        message = []
+        message << "#{hours}h" unless hours.zero?
+        message << "#{minutes}m" unless minutes.zero?
+        message << "#{seconds}s" unless seconds.zero?
+        message << "#{ms}ms" if message.empty?
+        message.join(' ')
       end
     end
   end

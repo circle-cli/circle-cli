@@ -43,10 +43,19 @@ module Circle::CLI
       end
 
       it 'caches the test results' do
-        expect(Project::Tests).to receive(:new).once.and_call_original
+        expect(project).to receive(:request).once.and_call_original
         project.test_results_for('build_num' => 5)
         project.test_results_for('build_num' => 5)
         project.test_results_for('build_num' => 5)
+      end
+    end
+
+    describe '#details_for', vcr: { cassette_name: 'get' } do
+      it 'caches the response' do
+        expect(project).to receive(:request).once.and_call_original
+        project.details_for('build_num' => 5)
+        project.details_for('build_num' => 5)
+        project.details_for('build_num' => 5)
       end
     end
 
