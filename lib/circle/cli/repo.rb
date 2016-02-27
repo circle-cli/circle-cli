@@ -29,7 +29,7 @@ module Circle
       end
 
       def circle_token
-        repo.config['circleci.token']
+        repo.config['circleci.token'] || ENV['CIRCLE_CLI_TOKEN']
       end
 
       def circle_token=(token)
