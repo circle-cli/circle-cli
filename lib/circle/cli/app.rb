@@ -35,16 +35,21 @@ CircleCI token hasn't been configured. Run the following command to login:
       def status
         validate_repo!
         validate_latest!
-        stop_time = pretty_date(project['stop_time']) || 'Still running...'
-        start_time = pretty_date(project['start_time']) || 'Not run'
+        start_time = pretty_date(project['start_time']) || 'Not started'
+        stop_time = pretty_date(project['stop_time']) || 'Not finished'
+        failures = project.latest_test_results.failing
 
-        say "#{project['subject']}\n\n", :cyan
+        say "#{project['subject']}\n\n", :cyan if project['subject']
         color = color_for_status project['status']
         say_project 'Build status', project['status'].capitalize, color
         say_project 'Started at', start_time, color
         say_project 'Finished at', stop_time, color
-        say_project 'Compare', project['compare'], color
-        display_failures project.latest_test_results.failing
+        say_project 'Compare', project['compare'], color if project['compare']
+
+        unless failures.empty?
+          display_failures failures
+          exit 1
+        end
       end
 
       desc 'overview', 'list recent builds and their statuses for all branches'
@@ -60,6 +65,15 @@ CircleCI token hasn't been configured. Run the following command to login:
         validate_repo!
         validate_latest!
         Launchy.open project['build_url']
+      end
+
+      desc 'build', 'trigger a build on circle ci'
+      method_option :branch, desc: 'branch name'
+      def build
+        validate_repo!
+        project.build!
+        invoke :status
+        say "\nA build has been triggered.", :green
       end
 
       desc 'token', 'view or edit CircleCI token'
@@ -134,7 +148,6 @@ CircleCI token hasn't been configured. Run the following command to login:
       end
 
       def display_failures(failures)
-        return if failures.empty?
         say "\nFailing specs:", :bold
 
         print_table failures.map { |spec|

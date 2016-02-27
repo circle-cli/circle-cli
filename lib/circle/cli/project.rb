@@ -30,6 +30,10 @@ module Circle
         latest[key]
       end
 
+      def build!
+        request CircleCi::Project, :build_branch, repo.branch_name
+      end
+
       def builds
         @builds ||= request CircleCi::Project, :recent_builds_branch, repo.branch_name
       end
