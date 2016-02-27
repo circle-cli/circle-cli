@@ -20,9 +20,9 @@ module Circle
       EOMSG
 
       default_task :status
+      class_option :repo, default: '.', desc: 'path to repo'
 
       desc 'status', 'show CircleCI build result'
-      method_option :repo, default: '.', desc: 'path to repo'
       method_option :branch, desc: 'branch name'
       def status
         validate_repo!
@@ -40,7 +40,6 @@ module Circle
       end
 
       desc 'overview', 'list recent builds and their statuses for all branches'
-      method_option :repo, default: '.', desc: 'path to repo'
       def overview
         validate_repo!
         abort! 'No recent builds.' if report.recent_builds.empty?
@@ -48,7 +47,6 @@ module Circle
       end
 
       desc 'open', 'open CircleCI build'
-      method_option :repo, default: '.', desc: 'path to repo'
       method_option :branch, desc: 'branch name'
       def open
         validate_repo!
@@ -57,7 +55,6 @@ module Circle
       end
 
       desc 'token', 'view or edit CircleCI token'
-      method_option :repo, default: '.', desc: 'path to repo'
       def token(value = nil)
         if value
           repo.circle_token = value
@@ -69,7 +66,6 @@ module Circle
       end
 
       desc 'login', 'login to Circle CI'
-      method_option :repo, default: '.', desc: 'path to repo'
       def login
         say LOGIN_HELP, :yellow
         ask set_color("\nPress [enter] to open CircleCI", :blue)
