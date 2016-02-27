@@ -2,7 +2,7 @@ require 'circleci'
 
 module Circle
   module CLI
-    class Report
+    class Project
       class Tests < Struct.new(:tests)
         def passing
           @passing ||= tests.reject(&failure_filter)

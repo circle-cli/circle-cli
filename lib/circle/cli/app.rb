@@ -1,6 +1,6 @@
 require 'launchy'
 require 'circle/cli/repo'
-require 'circle/cli/report'
+require 'circle/cli/project'
 
 module Circle
   module CLI
@@ -35,23 +35,23 @@ CircleCI token hasn't been configured. Run the following command to login:
       def status
         validate_repo!
         validate_latest!
-        stop_time = pretty_date(report['stop_time']) || 'Still running...'
-        start_time = pretty_date(report['start_time']) || 'Not run'
+        stop_time = pretty_date(project['stop_time']) || 'Still running...'
+        start_time = pretty_date(project['start_time']) || 'Not run'
 
-        say "#{report['subject']}\n\n", :cyan
-        color = color_for_status report['status']
-        say_report 'Build status', report['status'].capitalize, color
-        say_report 'Started at', start_time, color
-        say_report 'Finished at', stop_time, color
-        say_report 'Compare', report['compare'], color
-        display_failures report.latest_test_results.failing
+        say "#{project['subject']}\n\n", :cyan
+        color = color_for_status project['status']
+        say_project 'Build status', project['status'].capitalize, color
+        say_project 'Started at', start_time, color
+        say_project 'Finished at', stop_time, color
+        say_project 'Compare', project['compare'], color
+        display_failures project.latest_test_results.failing
       end
 
       desc 'overview', 'list recent builds and their statuses for all branches'
       def overview
         validate_repo!
-        abort! 'No recent builds.' if report.recent_builds.empty?
-        print_table builds_to_rows(report.recent_builds)
+        abort! 'No recent builds.' if project.recent_builds.empty?
+        print_table builds_to_rows(project.recent_builds)
       end
 
       desc 'open', 'open CircleCI build'
@@ -59,7 +59,7 @@ CircleCI token hasn't been configured. Run the following command to login:
       def open
         validate_repo!
         validate_latest!
-        Launchy.open report['build_url']
+        Launchy.open project['build_url']
       end
 
       desc 'token', 'view or edit CircleCI token'
@@ -89,8 +89,8 @@ CircleCI token hasn't been configured. Run the following command to login:
         @repo ||= Repo.new(options)
       end
 
-      def report
-        @report ||= Report.new(repo)
+      def project
+        @project ||= Project.new(repo)
       end
 
       def validate_repo!
@@ -99,7 +99,7 @@ CircleCI token hasn't been configured. Run the following command to login:
       end
 
       def validate_latest!
-        abort! 'No CircleCI builds found.' unless report.latest
+        abort! 'No CircleCI builds found.' unless project.latest
       end
 
       def abort!(message)
@@ -127,7 +127,7 @@ CircleCI token hasn't been configured. Run the following command to login:
         end
       end
 
-      def say_report(description, value, color)
+      def say_project(description, value, color)
         status = set_color description.ljust(15), :bold
         result = set_color value.to_s, color
         say "#{status} #{result}"
@@ -143,7 +143,7 @@ CircleCI token hasn't been configured. Run the following command to login:
       end
 
       def truncate(str, length = 50)
-        return str if str.length <= length
+        return str if !str || str.length <= length
         "#{str[0..50]}..."
       end
 

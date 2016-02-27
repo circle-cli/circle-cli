@@ -1,7 +1,8 @@
-require 'circle/cli/report'
+require 'spec_helper'
+require 'circle/cli/project'
 
 module Circle::CLI
-  RSpec.describe Report do
+  RSpec.describe Project do
     let(:repo) {
       instance_double('Repo', {
         project: 'rb-array-sorting',
@@ -11,48 +12,48 @@ module Circle::CLI
       })
     }
 
-    let(:report) {
-      Report.new(repo)
+    let(:project) {
+      Project.new(repo)
     }
 
     describe '#[]', vcr: { cassette_name: 'recent_builds_branch' } do
-      subject { report['status'] }
+      subject { project['status'] }
       specify { is_expected.to eq('no_tests') }
     end
 
     describe '#builds', vcr: { cassette_name: 'recent_builds_branch' } do
-      subject { report.builds }
+      subject { project.builds }
       specify { is_expected.not_to be_empty }
     end
 
     describe '#recent_builds', vcr: { cassette_name: 'recent_builds' } do
-      subject { report.recent_builds }
+      subject { project.recent_builds }
       specify { is_expected.not_to be_empty }
     end
 
     describe '#latest', vcr: { cassette_name: 'recent_builds_branch' } do
-      subject { report.latest['status'] }
+      subject { project.latest['status'] }
       specify { is_expected.to eq('no_tests') }
     end
 
     describe '#test_results_for', vcr: { cassette_name: 'tests' } do
       it 'returns a tests object' do
-        results = report.test_results_for('build_num' => 5)
-        expect(results).to be_a(Report::Tests)
+        results = project.test_results_for('build_num' => 5)
+        expect(results).to be_a(Project::Tests)
       end
 
       it 'caches the test results' do
-        expect(Report::Tests).to receive(:new).once.and_call_original
-        report.test_results_for('build_num' => 5)
-        report.test_results_for('build_num' => 5)
-        report.test_results_for('build_num' => 5)
+        expect(Project::Tests).to receive(:new).once.and_call_original
+        project.test_results_for('build_num' => 5)
+        project.test_results_for('build_num' => 5)
+        project.test_results_for('build_num' => 5)
       end
     end
 
-    describe Report::Tests do
+    describe Project::Tests do
       let(:failing) { { 'result' => 'failure' } }
       let(:passing) { { 'result' => 'success' } }
-      let(:tests) { Report::Tests.new([failing, passing]) }
+      let(:tests) { Project::Tests.new([failing, passing]) }
 
       describe '#passing' do
         subject { tests.passing[0]['result'] }
