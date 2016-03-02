@@ -6,6 +6,9 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'vcr'
 require 'webmock/rspec'
+require 'simplecov'
+
+SimpleCov.start
 
 VCR.configure do |config|
   config.cassette_library_dir = File.expand_path('../cassettes', __FILE__)

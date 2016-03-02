@@ -7,12 +7,6 @@ module Circle
     class App < Thor
       CIRCLE_URL = 'https://circleci.com/account/api'
 
-      STATUS_COLORS = {
-        green: %w(fixed success),
-        yellow: %w(running retried not_run queued scheduled not_running no_tests),
-        red: %w(canceled infrastructure_fail timedout failed)
-      }
-
       LOGIN_HELP = <<-EOMSG
 1. Press [enter], and you'll be taken CircleCI.
 2. Enter a name for your new token.
@@ -48,7 +42,8 @@ CircleCI token hasn't been configured. Run the following command to login:
         loop do
           display_status
           sleep options[:poll]
-          project.rebuild_latest_cache
+          project.clear_cache!
+          project.latest.preload
           system('clear') || system('cls')
         end
       end
@@ -57,7 +52,7 @@ CircleCI token hasn't been configured. Run the following command to login:
       def overview
         validate_repo!
         abort! 'No recent builds.' if project.recent_builds.empty?
-        print_table builds_to_rows(project.recent_builds)
+        display_builds project.recent_builds
       end
 
       desc 'open', 'open CircleCI build'
@@ -65,7 +60,7 @@ CircleCI token hasn't been configured. Run the following command to login:
       def open
         validate_repo!
         validate_latest!
-        Launchy.open project['build_url']
+        Launchy.open latest[:build_url]
       end
 
       desc 'build', 'trigger a build on circle ci'
@@ -82,10 +77,9 @@ CircleCI token hasn't been configured. Run the following command to login:
       def cancel
         validate_repo!
         validate_latest!
-
-        project.cancel! unless project['outcome']
+        latest.cancel! unless latest.finished?
         invoke :status
-        say "\nThe build has been cancelled.", :red unless project['outcome']
+        say "\nThe build has been cancelled.", :red unless latest.finished?
       end
 
       desc 'token', 'view or edit CircleCI token'
@@ -119,6 +113,10 @@ CircleCI token hasn't been configured. Run the following command to login:
         @project ||= Project.new(repo)
       end
 
+      def latest
+        project.latest
+      end
+
       def validate_repo!
         abort! "Unsupported repo url format #{repo.uri}" unless repo.uri.github?
         abort! NO_TOKEN_MESSAGE unless repo.circle_token
@@ -128,73 +126,34 @@ CircleCI token hasn't been configured. Run the following command to login:
         abort! 'No CircleCI builds found.' unless project.latest
       end
 
-      def display_status
-        start_time = pretty_date(project['start_time']) || 'Not started'
-        stop_time = pretty_date(project['stop_time']) || 'Not finished'
-
-        say "#{project['subject']}\n\n", :cyan if project['subject']
-        color = color_for_status project['status']
-        say_project 'Build status', project['status'].capitalize, color
-        say_project 'Started at', start_time, color
-        say_project 'Finished at', stop_time, color
-        say_project 'Compare', project['compare'], color if project['compare']
-        display_steps project.latest_details['steps']
-
-        failures = project.latest_test_results.failing
-        display_failures failures unless failures.empty?
-        exit_for_appropriate_outcome project['outcome']
-      end
-
       def abort!(message)
         abort set_color(message, :red)
       end
 
-      def exit_for_appropriate_outcome(outcome)
-        if outcome && outcome == 'failed'
-          exit 1
-        elsif outcome
-          exit 0
-        end
-      end
-
-      def color_for_status(status)
-        case status
-        when *STATUS_COLORS[:green] then :green
-        when *STATUS_COLORS[:yellow] then :yellow
-        when *STATUS_COLORS[:red] then :red
-        else :blue
-        end
-      end
-
-      def builds_to_rows(builds)
-        builds.map do |build|
-          branch = set_color(build['branch'], :bold)
-          status_color = color_for_status(build['status'])
-          status = build['status'].tr('_', ' ').capitalize
-          status = set_color(status, status_color)
-          subject = truncate build['subject']
-          started = pretty_date(build['start_time'])
-          [branch, status, subject, started]
-        end
-      end
-
-      def display_steps(steps)
-        return if steps.empty?
-        say "\nSteps:", :bold
-
-        print_table steps.map { |step|
-          action = step['actions'].first
-          color = color_for_status action['status']
-          millis = action['run_time_millis']
-          runtime = human_duration(millis) if millis
-          [set_color(step['name'], color), runtime]
-        }
-      end
-
-      def say_project(description, value, color)
+      def display(description, value, color)
         status = set_color description.ljust(15), :bold
         result = set_color value.to_s, color
         say "#{status} #{result}"
+      end
+
+      def display_status
+        say "#{latest[:subject]}\n\n", :cyan if latest[:subject]
+        display 'Build status', latest.status, latest.color
+        display 'Started at', latest.formatted_start_time, latest.color
+        display 'Finished at', latest.formatted_stop_time, latest.color
+        display 'Compare', latest[:compare], latest.color if latest[:compare]
+        display_steps latest.steps unless latest.steps.empty?
+        display_failures latest.failing_tests unless latest.failing_tests.empty?
+        exit 1 if latest.failed?
+        exit 0 if latest.finished?
+      end
+
+      def display_steps(steps)
+        say "\nSteps:", :bold
+
+        print_table steps.map { |step|
+          [set_color(step[:name], step.color), step.duration]
+        }
       end
 
       def display_failures(failures)
@@ -205,27 +164,13 @@ CircleCI token hasn't been configured. Run the following command to login:
         }
       end
 
-      def truncate(str, length = 50)
-        return str if !str || str.length <= length
-        "#{str[0..50]}..."
-      end
-
-      def pretty_date(str)
-        Time.parse(str).strftime('%b %e, %-l:%M %p') if str
-      rescue ArgumentError
-      end
-
-      def human_duration(ms)
-        hours = (ms / (1000 * 60 * 60)) % 24
-        minutes = (ms / (1000 * 60)) % 60
-        seconds = (ms / 1000) % 60
-
-        message = []
-        message << "#{hours}h" unless hours.zero?
-        message << "#{minutes}m" unless minutes.zero?
-        message << "#{seconds}s" unless seconds.zero?
-        message << "#{ms}ms" if message.empty?
-        message.join(' ')
+      def display_builds(builds)
+        print_table builds.map { |build|
+          branch = set_color(build[:branch], :bold)
+          status = set_color(build.status, build.color)
+          started = build.formatted_start_time
+          [branch, status, build.subject, started]
+        }
       end
     end
   end
