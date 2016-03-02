@@ -131,7 +131,6 @@ CircleCI token hasn't been configured. Run the following command to login:
       def display_status
         start_time = pretty_date(project['start_time']) || 'Not started'
         stop_time = pretty_date(project['stop_time']) || 'Not finished'
-        failures = project.latest_test_results.failing
 
         say "#{project['subject']}\n\n", :cyan if project['subject']
         color = color_for_status project['status']
@@ -140,6 +139,8 @@ CircleCI token hasn't been configured. Run the following command to login:
         say_project 'Finished at', stop_time, color
         say_project 'Compare', project['compare'], color if project['compare']
         display_steps project.latest_details['steps']
+
+        failures = project.latest_test_results.failing
         display_failures failures unless failures.empty?
         exit_for_appropriate_outcome project['outcome']
       end
