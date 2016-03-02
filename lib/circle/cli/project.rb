@@ -68,6 +68,19 @@ module Circle
         @test_results[build['build_num']] ||= test_results_for!(build)
       end
 
+      def clear_cache!
+        @details.clear
+        @test_results.clear
+        @recent_builds = nil
+        @builds = nil
+      end
+
+      def rebuild_latest_cache
+        clear_cache!
+        latest_test_results
+        latest_details
+      end
+
       private
 
       def details_for!(build)

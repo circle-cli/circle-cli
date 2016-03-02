@@ -35,21 +35,21 @@ CircleCI token hasn't been configured. Run the following command to login:
       def status
         validate_repo!
         validate_latest!
-        start_time = pretty_date(project['start_time']) || 'Not started'
-        stop_time = pretty_date(project['stop_time']) || 'Not finished'
-        failures = project.latest_test_results.failing
+        display_status
+      end
 
-        say "#{project['subject']}\n\n", :cyan if project['subject']
-        color = color_for_status project['status']
-        say_project 'Build status', project['status'].capitalize, color
-        say_project 'Started at', start_time, color
-        say_project 'Finished at', stop_time, color
-        say_project 'Compare', project['compare'], color if project['compare']
-        display_steps project.latest_details['steps']
+      desc 'watch', 'watch your build'
+      method_option :branch, desc: 'branch name'
+      method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
+      def watch
+        validate_repo!
+        validate_latest!
 
-        unless failures.empty?
-          display_failures failures
-          exit 1
+        loop do
+          display_status
+          sleep options[:poll]
+          project.rebuild_latest_cache
+          system('clear') || system('cls')
         end
       end
 
@@ -73,8 +73,8 @@ CircleCI token hasn't been configured. Run the following command to login:
       def build
         validate_repo!
         project.build!
-        invoke :status
-        say "\nA build has been triggered.", :green
+        say "A build has been triggered.\n\n", :green
+        invoke :watch
       end
 
       desc 'cancel', 'cancel most recent build'
@@ -128,8 +128,32 @@ CircleCI token hasn't been configured. Run the following command to login:
         abort! 'No CircleCI builds found.' unless project.latest
       end
 
+      def display_status
+        start_time = pretty_date(project['start_time']) || 'Not started'
+        stop_time = pretty_date(project['stop_time']) || 'Not finished'
+        failures = project.latest_test_results.failing
+
+        say "#{project['subject']}\n\n", :cyan if project['subject']
+        color = color_for_status project['status']
+        say_project 'Build status', project['status'].capitalize, color
+        say_project 'Started at', start_time, color
+        say_project 'Finished at', stop_time, color
+        say_project 'Compare', project['compare'], color if project['compare']
+        display_steps project.latest_details['steps']
+        display_failures failures unless failures.empty?
+        exit_for_appropriate_outcome project['outcome']
+      end
+
       def abort!(message)
         abort set_color(message, :red)
+      end
+
+      def exit_for_appropriate_outcome(outcome)
+        if outcome && outcome == 'failed'
+          exit 1
+        elsif outcome
+          exit 0
+        end
       end
 
       def color_for_status(status)
