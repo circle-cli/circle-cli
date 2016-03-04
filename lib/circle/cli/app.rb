@@ -38,21 +38,24 @@ CircleCI token hasn't been configured. Run the following command to login:
       def watch
         validate_repo!
         validate_latest!
-
-        loop do
+        watching -> { project.latest.preload } do
           display_status
-          sleep options[:poll]
-          project.clear_cache!
-          project.latest.preload
-          system('clear') || system('cls')
         end
       end
 
       desc 'overview', 'list recent builds and their statuses for all branches'
+      method_option :watch, desc: 'watch the list of builds'
+      method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
       def overview
         validate_repo!
         abort! 'No recent builds.' if project.recent_builds.empty?
-        display_builds project.recent_builds
+        show_overview = -> { display_builds(project.recent_builds) }
+
+        if options[:watch]
+          watching(-> { project.recent_builds  }, &show_overview)
+        else
+          show_overview
+        end
       end
 
       desc 'open', 'open CircleCI build'
@@ -128,6 +131,18 @@ CircleCI token hasn't been configured. Run the following command to login:
 
       def abort!(message)
         abort set_color(message, :red)
+      end
+
+      def watching(preloader)
+        loop do
+          yield
+          sleep options[:poll]
+          project.clear_cache!
+          preloader.call
+          system('clear') || system('cls')
+        end
+      rescue Interrupt
+        exit 0
       end
 
       def display(description, value, color)
