@@ -4,8 +4,19 @@
 # loaded once.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+require 'vcr'
+require 'webmock/rspec'
+require 'simplecov'
+
+SimpleCov.start
+
+VCR.configure do |config|
+  config.cassette_library_dir = File.expand_path('../cassettes', __FILE__)
+  config.hook_into :webmock
+  config.configure_rspec_metadata!
+end
+
 RSpec.configure do |config|
-  config.treat_symbols_as_metadata_keys_with_true_values = true
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
 
