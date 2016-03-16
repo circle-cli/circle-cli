@@ -33,7 +33,19 @@ module Circle
       end
 
       def request(klass, action, *args)
-        klass.send(action, repo.user_name, repo.project, *args).body
+        response = klass.send(action, repo.user_name, repo.project, *args)
+
+        if response.success?
+          response.body
+        else
+          $stderr.puts 'One or more errors occurred:'
+
+          response.errors.each do |error|
+            $stderr.puts "+ #{error.message}"
+          end
+
+          exit 1
+        end
       end
 
       private
