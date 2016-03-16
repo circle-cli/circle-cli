@@ -15,7 +15,7 @@ module Circle
       end
 
       def user_name
-        uri.path.split('/').first
+        uri.path[/^(\/?)(.+)\//, 2]
       end
 
       def project
