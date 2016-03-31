@@ -15,7 +15,7 @@ module Circle
       end
 
       def user_name
-        uri.path.split('/').first
+        uri.path[/^(\/?)(.+)\//, 2]
       end
 
       def project
@@ -40,6 +40,9 @@ module Circle
 
       def repo
         @repo ||= Rugged::Repository.new(options[:repo])
+      rescue Rugged::RepositoryError
+        full_path = File.expand_path(options[:repo])
+        abort "#{full_path} is not a git repository."
       end
 
       def origin
