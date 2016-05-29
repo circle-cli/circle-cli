@@ -57,7 +57,7 @@ module Circle
       end
 
       def to_builds(arr)
-        arr.map { |build| Build.new(self, build) }
+        arr.to_a.map { |build| Build.new(self, build) }
       end
     end
   end
