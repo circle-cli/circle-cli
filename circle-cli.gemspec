@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'circleci'
-  spec.add_dependency 'rugged', '>= 0.23'
+  spec.add_dependency 'git'
   spec.add_dependency 'gitable'
   spec.add_dependency 'launchy'
   spec.add_dependency 'thor'

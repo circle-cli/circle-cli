@@ -6,19 +6,17 @@ module Circle::CLI
     let(:options) { {} }
     let(:repo) { Repo.new(options) }
     let(:uri) { 'git@github.com:organization/repo.git' }
-
-    let(:origin) {
-      double('remote', name: 'origin', url: uri)
-    }
-
-    let(:git) {
-      instance_double Rugged::Repository, {
-        config: { 'circleci.token' => '123' },
-        remotes: [origin]
-      }
-    }
+    let(:origin) { instance_double Git::Remote, url: uri }
+    let(:git) { instance_double Git::Base, current_branch: 'bug/jawn' }
+    let(:repo_config) { { 'circleci.token' => '123' } }
 
     before do
+      allow(git).to receive(:config) do |name, value|
+        repo_config[name] = value if value
+        repo_config[name]
+      end
+
+      allow(git).to receive(:remote).and_return(origin)
       allow(repo).to receive(:repo).and_return(git)
     end
 
@@ -46,8 +44,6 @@ module Circle::CLI
       end
 
       context 'when :branch isnt provided' do
-        let(:head) { double('head', name: 'refs/heads/bug/jawn') }
-        before { allow(git).to receive(:head).and_return(head) }
         specify { is_expected.to eq('bug/jawn') }
       end
     end
