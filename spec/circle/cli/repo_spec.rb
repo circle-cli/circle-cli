@@ -12,10 +12,10 @@ module Circle::CLI
     }
 
     let(:git) {
-      instance_double('Rugged::Repository', {
-        config: {'circleci.token' => '123' },
+      instance_double Rugged::Repository, {
+        config: { 'circleci.token' => '123' },
         remotes: [origin]
-      })
+      }
     }
 
     before do
