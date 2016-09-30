@@ -54,7 +54,7 @@ CircleCI token hasn't been configured. Run the following command to login:
         if options[:watch]
           watching(-> { project.recent_builds  }, &show_overview)
         else
-          show_overview
+          show_overview.call
         end
       end
 
