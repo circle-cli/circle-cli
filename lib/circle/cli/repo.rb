@@ -27,7 +27,8 @@ module Circle
       end
 
       def circle_token
-        repo.config('circleci.token') || ENV['CIRCLE_CLI_TOKEN']
+        token = repo.config('circleci.token') || ENV['CIRCLE_CLI_TOKEN']
+        token if token && !token.empty?
       end
 
       def circle_token=(token)
