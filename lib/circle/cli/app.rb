@@ -1,6 +1,7 @@
 require 'launchy'
 require 'circle/cli/repo'
 require 'circle/cli/project'
+require 'circle/cli/watcher'
 
 module Circle
   module CLI
@@ -26,21 +27,31 @@ CircleCI token hasn't been configured. Run the following command to login:
 
       desc 'status', 'show CircleCI build result'
       method_option :branch, desc: 'branch name'
+      method_option :watch, desc: 'watch the build'
+      method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
       def status
         validate_repo!
         validate_latest!
-        display_status
-      end
 
-      desc 'watch', 'watch your build'
-      method_option :branch, desc: 'branch name'
-      method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
-      def watch
-        validate_repo!
-        validate_latest!
-        watching -> { project.latest.preload } do
+        watcher = Watcher.new do
           display_status
         end
+
+        watcher.to_preload do
+          project.clear_cache!
+          project.latest.preload
+        end
+
+        if options[:watch]
+          watcher.poll(options[:poll])
+        else
+          watcher.display
+        end
+      end
+
+      desc 'watch', '[deprecated]', hide: true
+      def watch
+        abort! 'This command has been deprecated. Use `circle --watch`.'
       end
 
       desc 'overview', 'list recent builds and their statuses for all branches'
@@ -49,12 +60,20 @@ CircleCI token hasn't been configured. Run the following command to login:
       def overview
         validate_repo!
         abort! 'No recent builds.' if project.recent_builds.empty?
-        show_overview = -> { display_builds(project.recent_builds) }
+
+        watcher = Watcher.new do
+          display_builds(project.recent_builds)
+        end
+
+        watcher.to_preload do
+          project.clear_cache!
+          project.recent_builds
+        end
 
         if options[:watch]
-          watching(-> { project.recent_builds  }, &show_overview)
+          watcher.poll(options[:poll])
         else
-          show_overview.call
+          watcher.display
         end
       end
 
@@ -131,18 +150,6 @@ CircleCI token hasn't been configured. Run the following command to login:
 
       def abort!(message)
         abort set_color(message, :red)
-      end
-
-      def watching(preloader)
-        loop do
-          yield
-          sleep options[:poll]
-          project.clear_cache!
-          preloader.call
-          system('clear') || system('cls')
-        end
-      rescue Interrupt
-        exit 0
       end
 
       def display(description, value, color)
