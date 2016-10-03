@@ -27,7 +27,7 @@ CircleCI token hasn't been configured. Run the following command to login:
 
       desc 'status', 'show CircleCI build result'
       method_option :branch, desc: 'branch name'
-      method_option :watch, desc: 'watch the build'
+      method_option :watch, desc: 'watch the build', type: :boolean, default: false
       method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
       def status
         validate_repo!
@@ -49,13 +49,13 @@ CircleCI token hasn't been configured. Run the following command to login:
         end
       end
 
-      desc 'watch', '[deprecated]', hide: true
+      desc 'watch', 'an alias for `circle --watch`', hide: true
       def watch
-        abort! 'This command has been deprecated. Use `circle --watch`.'
+        invoke :status, [], watch: true
       end
 
       desc 'overview', 'list recent builds and their statuses for all branches'
-      method_option :watch, desc: 'watch the list of builds'
+      method_option :watch, desc: 'watch the list of builds', type: :boolean, default: false
       method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
       def overview
         validate_repo!
@@ -91,7 +91,7 @@ CircleCI token hasn't been configured. Run the following command to login:
         validate_repo!
         project.build!
         say "A build has been triggered.\n\n", :green
-        invoke :watch
+        invoke :status, [], watch: true
       end
 
       desc 'cancel', 'cancel most recent build'
