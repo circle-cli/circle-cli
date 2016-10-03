@@ -16,11 +16,11 @@ module Circle
       end
 
       def builds
-        @builds ||= to_builds(request(CircleCi::Project, :recent_builds_branch, repo.branch_name))
+        @builds ||= request_builds(CircleCi::Project, :recent_builds_branch, repo.branch_name)
       end
 
       def recent_builds
-        @recent_builds ||= to_builds(request(CircleCi::Project, :recent_builds))
+        @recent_builds ||= request_builds(CircleCi::Project, :recent_builds)
       end
 
       def latest
@@ -38,13 +38,7 @@ module Circle
         if response.success?
           response.body
         else
-          $stderr.puts 'One or more errors occurred:'
-
-          response.errors.each do |error|
-            $stderr.puts "+ #{error.message}"
-          end
-
-          exit 1
+          abort "The following error occurred: #{response.body['message']}"
         end
       end
 
@@ -56,8 +50,8 @@ module Circle
         end
       end
 
-      def to_builds(arr)
-        arr.to_a.map { |build| Build.new(self, build) }
+      def request_builds(*args)
+        request(*args).to_a.map { |build| Build.new(self, build) }
       end
     end
   end

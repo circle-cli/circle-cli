@@ -2,19 +2,21 @@
 http_interactions:
 - request:
     method: get
-    uri: https://circleci.com/api/v1/project/mtchavez/rb-array-sorting/5/tests?circle-token=123
+    uri: https://circleci.com/api/v1/project/mtchavez/circleci/140/tests?circle-token=123
     body:
-      encoding: US-ASCII
-      string: ''
+      encoding: UTF-8
+      string: "{}"
     headers:
       Accept:
       - application/json
-      Accept-Encoding:
-      - gzip, deflate
       Content-Type:
       - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
       User-Agent:
       - Ruby
+      Host:
+      - circleci.com
   response:
     status:
       code: 200
@@ -22,60 +24,117 @@ http_interactions:
     headers:
       Access-Control-Allow-Origin:
       - "*"
-      Content-Encoding:
-      - gzip
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Sun, 29 Mar 2015 22:55:57 GMT
+      - Sun, 25 Sep 2016 17:42:18 GMT
       Server:
       - nginx
       Set-Cookie:
-      - ab_test_user_seed=0.39268708614490533;Expires=Tue, 29 Mar 2016 22:55:57 +0000;Path=/;Secure
-      - ring-session=CzS62UD0EyDOhDL38YweoV%2FYDBdyTa%2BoIWPRBOS9gkFdfeKS0QJGnLEHwYv2CY%2FeolK0Dypk3Y1pFS7zhdg7SDuK3WtWbC5WHu1Aq8zl8WLrAvNfsdhvIpgsMB6TOoI%2BJm3H9j64%2F91oBtMt%2B4jStTAEgX4EBIK%2Bdnym0zrRyRFUPG%2Bc0lLwzZRZ%2BoBbP3xANRHXBQpiMIPpZXVcYOS2SRfdYY9OFTJue5ufEwekGAA%3D--OgruTcmL77%2Fr1UDxot%2B3j13CkEcoc7ts07yAbO6ii3k%3D;Secure;Max-Age=31536000;Expires=Tue,
-        29 Mar 2016 20:42:56 +0000;HttpOnly;Path=/
+      - ab_test_user_seed=0.9072782664205761;Expires=Mon, 25 Sep 2017 17:42:18 +0000;Path=/;Secure
+      - ring-session=nld5qTzYAN6AwdEMgjkeA8mHvK5EHL63rvI7tRI9L8olux5VJeX4G4y4BSdELFZrt3qgjY7Pkkwv%2FvAyl9q4oDgDOetMF54sRhMgVKn30VA%2FW7kWac1Va7s7gU2WSD5fO8s9T5DauTuMHYArhzqPqRKCZKX46upGczwuHn%2FfqtsWQbwRjYgVVwdUAvD0aWUaa7Bgg5KEjW%2FEOteddvMJ3b0zjLuVosATweHctBnpAw0%3D--K4Q0BElHok6vp8LrzrmkIDPnox54RuBWwtWpm3q6bWc%3D;Path=/;HttpOnly;Expires=Mon,
+        25 Sep 2017 17:00:26 +0000;Max-Age=31536000;Secure
+      Strict-Transport-Security:
+      - max-age=15724800
       X-Circleci-Identity:
-      - i-1c5e7a33
+      - i-99bbbc8e
+      X-Circleci-Request-Id:
+      - 2cd887b0-c20b-4577-87f4-3c26a7abedab
       X-Circleci-Scopes:
-      - ":all"
       - ":none"
-      - ":read-settings"
       - ":status"
       - ":view-builds"
-      - ":write-settings"
       X-Frame-Options:
       - DENY
       X-Route:
-      - "/api/v1/project/:username/:repo/:build_num/tests"
+      - "/tests"
       - ":build_num"
       - "\\d+"
       Content-Length:
-      - '895'
+      - '1337'
       Connection:
       - keep-alive
     body:
       encoding: ASCII-8BIT
-      string: !binary |-
-        H4sIAAAAAAAAANyZTW/bIBjHvwryuU1tx7GNb1u1w3bYqk07TVNECE5YCViA
-        1aVVv/vAbpp2WmJo2sTeLcEPmB9/eF7MXaCJ0iooftwFStQSk6leVyQoAqkq
-        goOzYEWUQgvTwmvGzoKSMvvUPrzAVGJGMJ3afyM5M9btGE+6y5pPNV2ZpnAU
-        htkE5qaNqJppO0qNsRnemHFkTYLLZsRLCoRcIE5vkaaCA0l0LbkCCDCqNBCl
-        acGEazCrKZvb7pghpR7GaCbzbGrB/dlR6NIsHvvTqaWo2RzMCNh26AdPDiE8
-        hAdxQLnSiGNiRduYF8VXoirBFekFaTRKkg/niRMoFryki1q2pNgAWszGmswB
-        KjWRpoXyBVBE94UufRmdRtdEgRkT+BpoYYEeDN6Y66JWRLpv0knuBFcU382w
-        YPV4ykozgfWja1mtwRxptA9t9Divo/LlYeh0CDsAkfnVHjogZr8I3rs7Xw21
-        ksK+y8OF5nDiRnvVDm33pTYHTnViL5Fa7oV+Otljc8MsSd+I20HuU5KnMPYk
-        r3kpGBM3Q1d87JQKvYC734rHaR5HfuT/hd7j3Ck59Kbut9rGo7slxVtuwtGM
-        7QhjeknAZi6g+ssV9nYNYOIb1fatwYC0n0BP327+IjnFCC93wTO20b3HeqeJ
-        p97d3IMRPYsmjhn5Br6t5qdtNT+dSVMwLrvVN/5RmmVpzfu6GpF1/G+2GkPZ
-        E1E0Tg9ZBcAFP691mRu/iMXc1tefvn35DCokbd2NhTTmmq37yh+mSZYdwj9g
-        VxjFjuWrD/lQNn6YZtBT+Ib7n8fefm4yhTkgvysizRu4Rgy8u/rYOML3thu4
-        QtKMq4ns74bIovDVVmSzHzi5sesjCdLGHTT2feU3ASH0zA26+Yd0HiaeGWFD
-        P3jZ43wcemZFe8AHo7cJ/K6fZzfYNqoNNtxFYe6b+e/mPZXI7Vd+1+uFce54
-        vVAUl83AgHKqKWL0ltjKXYE5KZHpCyoh9zM+mdhREbP4tRCXQh0LsY0a7mE5
-        dEzQ20QDSU1LZKuwnWd1a2Lzk27vvJ3wUcmjME4cM1Q3dK9jeyLoMIWuZWkL
-        bejk+kC/fCpWmEHH783drIMQN0tTx6uFFhjbG/qdUah96pRgnUzh1DHouvAO
-        QmHna9KWeEH0MA9vDGHuWC52kb5Y2J/3fwAAAP//AwCbqG4IJiUAAA==
-    http_version:
-  recorded_at: Sun, 29 Mar 2015 22:55:57 GMT
-recorded_with: VCR 2.9.3
+      string: '{"tests":[{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        artifacts successfully returns a response object","result":"success","run_time":0.011007,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        artifacts successfully returns all artifacts for build","result":"success","run_time":0.005647,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        cancel successfully returns a response object","result":"success","run_time":0.007057,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        cancel successfully returns a canceled build","result":"success","run_time":0.004901,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        get successfully returns a response object","result":"success","run_time":0.006744,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        get successfully returns all projects","result":"success","run_time":0.0047,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        retry successfully returns a response object","result":"success","run_time":0.007137,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        retry successfully returns all projects","result":"success","run_time":0.004901,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        tests successfully returns a response object","result":"success","run_time":0.00875,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.build_spec","file":"spec/circleci/build_spec.rb","name":"CircleCi::Build
+        tests successfully returns all artifacts for build","result":"success","run_time":0.006534,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        initialize sets default host","result":"success","run_time":1.15E-4,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        initialize sets default version","result":"success","run_time":8.5E-5,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        initialize sets default port","result":"success","run_time":8.5E-5,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        uri includes port if not 80","result":"success","run_time":4.68E-4,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        uri does not include default port","result":"success","run_time":1.19E-4,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        uri includes port if set on host","result":"success","run_time":1.79E-4,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        is port 80 returns true if default port","result":"success","run_time":1.07E-4,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        is port 80 returns false if not default port","result":"success","run_time":9.9E-5,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        host has port returns true if host has port set","result":"success","run_time":1.16E-4,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.config_spec","file":"spec/circleci/config_spec.rb","name":"CircleCi::Config
+        host has port returns false if host does not have port set","result":"success","run_time":9.1E-5,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        all successfully returns a response object","result":"success","run_time":0.008592,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        all successfully returns all projects","result":"success","run_time":0.00939,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        build successfully returns a response object","result":"success","run_time":0.006901,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        build successfully returns newly created build","result":"success","run_time":0.004704,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        build_branch successfully returns a response object","result":"success","run_time":0.007272,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        build_branch successfully returns newly created build","result":"success","run_time":0.005112,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        build_branch successfully can use experimental API for Build Parameters","result":"success","run_time":0.00471,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        build_ssh_key successfully returns a response object","result":"success","run_time":0.00739,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        delete_checkout_key successfully returns a response object","result":"success","run_time":0.008897,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        delete_checkout_key successfully returns message","result":"success","run_time":0.00602,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        delete_checkout_key unsuccessfully returns a response object","result":"success","run_time":0.010369,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        delete_checkout_key unsuccessfully returns an error message","result":"success","run_time":0.004884,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        get_checkout_key successfully returns a response object","result":"success","run_time":0.008348,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        get_checkout_key successfully returns key","result":"success","run_time":0.005387,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        get_checkout_key unsuccessfully returns a response object","result":"success","run_time":0.005295,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        get_checkout_key unsuccessfully returns an error message","result":"success","run_time":0.005373,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        list_checkout_keys successfully returns a response object","result":"success","run_time":0.007017,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        list_checkout_keys successfully returns a list of checkout keys","result":"success","run_time":0.0049,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        new_checkout_key successfully returns a response object","result":"success","run_time":0.004702,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        new_checkout_key successfully returns created key","result":"success","run_time":0.00501,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        new_checkout_key unsuccessfully returns a response object","result":"success","run_time":0.006726,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        new_checkout_key unsuccessfully returns an error message","result":"success","run_time":0.004874,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        recent_builds successfully returns a response object","result":"success","run_time":0.008803,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        recent_builds successfully returns all projects","result":"success","run_time":0.006853,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        recent_builds successfully params limit returns correct total of builds","result":"success","run_time":0.009766,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        recent_builds successfully params filter returns builds filtered by status","result":"success","run_time":0.01054,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        recent_builds non-utf8 encoding JSON parsed correctly","result":"success","run_time":0.009901,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        recent_builds_branch successfully returns a response object","result":"success","run_time":0.007433,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        recent_builds_branch successfully returns all projects for a branch","result":"success","run_time":0.005221,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        ssh_key successfully returns a response object","result":"success","run_time":0.007255,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        ssh_key unsuccessfully returns a response object","result":"success","run_time":0.004506,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        ssh_key unsuccessfully returns error message","result":"success","run_time":0.004867,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        clear_cache successfully returns a response object","result":"success","run_time":0.006839,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        clear_cache successfully returns all projects","result":"success","run_time":0.004662,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        enable successfully returns a response object","result":"success","run_time":0.007013,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        enable successfully returns the circleci project settings","result":"success","run_time":0.004877,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        follow successfully returns a response object","result":"success","run_time":0.009299,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        follow successfully returns a response hash","result":"success","run_time":0.00475,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        unfollow successfully returns a response object","result":"success","run_time":0.006762,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        unfollow successfully returns a response hash","result":"success","run_time":0.004754,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        settings successfully returns a response object","result":"success","run_time":0.007047,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        settings successfully returns a response hash","result":"success","run_time":0.004793,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        envvar successfully returns a response object","result":"success","run_time":0.006897,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        envvar successfully returns a response hash","result":"success","run_time":0.004793,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        envvar unsuccessfully returns a response object","result":"success","run_time":0.006734,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        envvar unsuccessfully returns an error message","result":"success","run_time":0.004681,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        set_envvar successfully returns a response object","result":"success","run_time":0.004594,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        set_envvar successfully returns a response hash","result":"success","run_time":0.005183,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        set_envvar unsuccessfully returns a response object","result":"success","run_time":0.004482,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.project_spec","file":"spec/circleci/project_spec.rb","name":"CircleCi::Project
+        set_envvar unsuccessfully returns an error message","result":"success","run_time":0.004774,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.recent_builds_spec","file":"spec/circleci/recent_builds_spec.rb","name":"CircleCi::RecentBuilds
+        get successfully returns a response object","result":"success","run_time":0.009181,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.recent_builds_spec","file":"spec/circleci/recent_builds_spec.rb","name":"CircleCi::RecentBuilds
+        get successfully returns recent builds","result":"success","run_time":0.007523,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.recent_builds_spec","file":"spec/circleci/recent_builds_spec.rb","name":"CircleCi::RecentBuilds
+        get successfully with limit returns correct total of builds","result":"success","run_time":0.007967,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.user_spec","file":"spec/circleci/user_spec.rb","name":"CircleCi::User
+        me successfully returns a response object","result":"success","run_time":0.005693,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.user_spec","file":"spec/circleci/user_spec.rb","name":"CircleCi::User
+        me successfully returns my data","result":"success","run_time":0.004187,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci.user_spec","file":"spec/circleci/user_spec.rb","name":"CircleCi::User
+        heroku-key successfully returns a response object","result":"success","run_time":0.006424,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci_spec","file":"spec/circleci_spec.rb","name":"CircleCi
+        configuration takes block to set config","result":"success","run_time":9.8E-5,"message":null,"source":"rspec","source_type":"rspec"},{"classname":"spec.circleci_spec","file":"spec/circleci_spec.rb","name":"CircleCi
+        configuration can be accessed after being set","result":"success","run_time":1.03E-4,"message":null,"source":"rspec","source_type":"rspec"}],"exceptions":[]}'
+    http_version: 
+  recorded_at: Sun, 25 Sep 2016 17:42:12 GMT
+recorded_with: VCR 3.0.3

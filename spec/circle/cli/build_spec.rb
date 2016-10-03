@@ -5,12 +5,12 @@ require 'circle/cli/project'
 module Circle::CLI
   RSpec.describe Build do
     let(:repo) {
-      instance_double('Repo', {
-        project: 'rb-array-sorting',
+      instance_double Repo, {
+        project: 'circleci',
         user_name: 'mtchavez',
         branch_name: 'master',
         circle_token: '123'
-      })
+      }
     }
 
     let(:project)   { Project.new(repo) }
@@ -63,10 +63,10 @@ module Circle::CLI
     end
 
     describe '#tests', vcr: { cassette_name: 'tests' } do
-      let(:build) { Build.new(project, 'build_num' => 5) }
+      let(:build) { Build.new(project, 'build_num' => 140) }
 
       it 'returns a list of tests' do
-        expect(build.tests.length).to eq(39)
+        expect(build.tests.length).to eq(78)
       end
 
       it 'caches the test results' do
@@ -77,15 +77,15 @@ module Circle::CLI
     end
 
     describe '#passing_tests', vcr: { cassette_name: 'tests' } do
-      let(:build) { Build.new(project, 'build_num' => 5) }
+      let(:build) { Build.new(project, 'build_num' => 140) }
 
       it 'returns only passing specs' do
-        expect(build.passing_tests.length).to eq(39)
+        expect(build.passing_tests.length).to eq(78)
       end
     end
 
     describe '#failing_tests', vcr: { cassette_name: 'tests' } do
-      let(:build) { Build.new(project, 'build_num' => 5) }
+      let(:build) { Build.new(project, 'build_num' => 140) }
 
       it 'returns only failing specs' do
         expect(build.failing_tests.length).to eq(0)
@@ -93,7 +93,7 @@ module Circle::CLI
     end
 
     describe '#details', vcr: { cassette_name: 'get' } do
-      let(:build) { Build.new(project, 'build_num' => 5) }
+      let(:build) { Build.new(project, 'build_num' => 140) }
 
       it 'caches the response' do
         expect(project).to receive(:request).once.and_call_original

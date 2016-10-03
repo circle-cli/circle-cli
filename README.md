@@ -44,7 +44,7 @@ Command line tools for Circle CI
 - Watch the most recent CI build for your current branch
 
   ```
-  $ circle watch
+  $ circle --watch
   ```
 
 - Cancel the most recent CI build for your current branch

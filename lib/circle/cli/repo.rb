@@ -1,5 +1,5 @@
 require 'gitable'
-require 'rugged'
+require 'git'
 
 module Circle
   module CLI
@@ -23,30 +23,29 @@ module Circle
       end
 
       def branch_name
-        options.fetch 'branch' do
-          repo.head.name.sub(/^refs\/heads\//, '')
-        end
+        options.fetch('branch') { repo.current_branch }
       end
 
       def circle_token
-        repo.config['circleci.token'] || ENV['CIRCLE_CLI_TOKEN']
+        token = repo.config('circleci.token') || ENV['CIRCLE_CLI_TOKEN']
+        token if token && !token.empty?
       end
 
       def circle_token=(token)
-        repo.config['circleci.token'] = token
+        repo.config('circleci.token', token)
       end
 
       private
 
       def repo
-        @repo ||= Rugged::Repository.new(options[:repo])
-      rescue Rugged::RepositoryError
+        @repo ||= Git.open(options[:repo])
+      rescue ArgumentError
         full_path = File.expand_path(options[:repo])
         abort "#{full_path} is not a git repository."
       end
 
       def origin
-        @origin ||= repo.remotes.find { |r| r.name == 'origin' }
+        @origin ||= repo.remote('origin')
       end
     end
   end

@@ -1,3 +1,5 @@
+require 'time'
+
 module Circle
   module CLI
     class Model

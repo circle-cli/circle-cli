@@ -1,15 +1,16 @@
 require 'spec_helper'
 require 'circle/cli/project'
+require 'circle/cli/repo'
 
 module Circle::CLI
   RSpec.describe Project do
     let(:repo) {
-      instance_double('Repo', {
-        project: 'rb-array-sorting',
+      instance_double Repo, {
+        project: 'circleci',
         user_name: 'mtchavez',
         branch_name: 'master',
         circle_token: '123'
-      })
+      }
     }
 
     let(:project) {
@@ -28,7 +29,7 @@ module Circle::CLI
 
     describe '#latest', vcr: { cassette_name: 'recent_builds_branch' } do
       subject { project.latest['status'] }
-      specify { is_expected.to eq('no_tests') }
+      specify { is_expected.to eq('success') }
     end
   end
 end
