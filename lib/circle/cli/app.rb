@@ -1,7 +1,11 @@
+require 'io/console'
 require 'launchy'
+require 'thor'
 require 'circle/cli/repo'
 require 'circle/cli/project'
 require 'circle/cli/watcher'
+require 'circle/cli/tui/dashboard_renderer'
+require 'circle/cli/tui/data_source'
 
 module Circle
   module CLI
@@ -104,6 +108,41 @@ CircleCI token hasn't been configured. Run the following command to login:
         say "\nThe build has been cancelled.", :red unless latest.finished?
       end
 
+      desc 'dashboard', 'show a modern CircleCI pipeline dashboard'
+      method_option :sample, type: :boolean, default: false,
+                             desc: 'render bundled sample data without repo or token access'
+      method_option :color, type: :boolean, default: true,
+                            desc: 'enable ANSI color output'
+      method_option :unicode, type: :boolean, default: true,
+                              desc: 'enable unicode icons and box drawing'
+      method_option :width, type: :numeric,
+                            desc: 'override terminal width for rendering'
+      def dashboard
+        data = TUI::DataSource.for(
+          sample: options[:sample],
+          project: (project unless options[:sample])
+        ).dashboard
+        say TUI::DashboardRenderer.new(
+          data,
+          color: options[:color],
+          unicode: options[:unicode],
+          width: dashboard_width
+        ).render
+      rescue TUI::PendingIntegration => e
+        abort! e.message
+      rescue StandardError => e
+        abort! "Unable to load dashboard data: #{e.message}"
+      end
+
+      desc 'tui', 'an alias for `circle dashboard`', hide: true
+      method_option :sample, type: :boolean, default: false
+      method_option :color, type: :boolean, default: true
+      method_option :unicode, type: :boolean, default: true
+      method_option :width, type: :numeric
+      def tui
+        invoke :dashboard, [], options
+      end
+
       desc 'token', 'view or edit CircleCI token'
       def token(value = nil)
         if value
@@ -137,6 +176,12 @@ CircleCI token hasn't been configured. Run the following command to login:
 
       def latest
         project.latest
+      end
+
+      def dashboard_width
+        options[:width] || (IO.console && IO.console.winsize[1]) || 80
+      rescue SystemCallError
+        80
       end
 
       def validate_repo!
