@@ -4,6 +4,12 @@ require 'git'
 module Circle
   module CLI
     class Repo
+      # Maps a remote host to the CircleCI v2 VCS slug prefix.
+      VCS_PREFIXES = {
+        'github.com'    => 'gh',
+        'bitbucket.org' => 'bb'
+      }.freeze
+
       attr_reader :errors, :options
 
       def initialize(options = {})
@@ -35,7 +41,26 @@ module Circle
         repo.config('circleci.token', token)
       end
 
+      # CircleCI API v2 project slug ("vcs/org/project"). Resolution order:
+      # CIRCLE_CLI_PROJECT_SLUG env, then git config circleci.project-slug,
+      # then inference from the origin remote.
+      def project_slug
+        env = ENV['CIRCLE_CLI_PROJECT_SLUG']
+        return env if env && !env.empty?
+        configured_slug || inferred_slug
+      end
+
       private
+
+      def configured_slug
+        slug = repo.config('circleci.project-slug')
+        slug if slug && !slug.empty?
+      end
+
+      def inferred_slug
+        prefix = VCS_PREFIXES[uri.host] || 'gh'
+        "#{prefix}/#{user_name}/#{project}"
+      end
 
       def repo
         @repo ||= Git.open(options[:repo])

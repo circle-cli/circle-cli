@@ -58,5 +58,35 @@ module Circle::CLI
       before { repo.circle_token = '456' }
       specify { is_expected.to eq('456') }
     end
+
+    describe '#project_slug' do
+      subject { repo.project_slug }
+
+      around do |example|
+        original = ENV['CIRCLE_CLI_PROJECT_SLUG']
+        ENV.delete('CIRCLE_CLI_PROJECT_SLUG')
+        example.run
+        ENV['CIRCLE_CLI_PROJECT_SLUG'] = original
+      end
+
+      context 'with the CIRCLE_CLI_PROJECT_SLUG env override' do
+        before { ENV['CIRCLE_CLI_PROJECT_SLUG'] = 'gh/env-org/env-repo' }
+        specify { is_expected.to eq('gh/env-org/env-repo') }
+      end
+
+      context 'with a configured circleci.project-slug' do
+        let(:repo_config) { { 'circleci.project-slug' => 'gh/cfg-org/cfg-repo' } }
+        specify { is_expected.to eq('gh/cfg-org/cfg-repo') }
+      end
+
+      context 'falling back to inference from a github remote' do
+        specify { is_expected.to eq('gh/organization/repo') }
+      end
+
+      context 'falling back to inference from a bitbucket remote' do
+        let(:uri) { 'git@bitbucket.org:organization/repo.git' }
+        specify { is_expected.to eq('bb/organization/repo') }
+      end
+    end
   end
 end

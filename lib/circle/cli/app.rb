@@ -1,7 +1,10 @@
+require 'thor'
 require 'launchy'
 require 'circle/cli/repo'
 require 'circle/cli/project'
 require 'circle/cli/watcher'
+require 'circle/cli/api_client'
+require 'circle/cli/api_error'
 
 module Circle
   module CLI
@@ -115,6 +118,34 @@ CircleCI token hasn't been configured. Run the following command to login:
         end
       end
 
+      desc 'me', 'show the current CircleCI user (API v2)'
+      def me
+        validate_token!
+        user = api.get('/me')
+        say "#{user['name'] || user['login']} (#{user['id']})"
+      rescue ApiError => e
+        abort! e.message
+      end
+
+      desc 'pipelines', 'list recent pipelines for this project (API v2)'
+      method_option :branch, desc: 'branch name'
+      def pipelines
+        validate_token!
+        query = {}
+        query[:branch] = options[:branch] if options[:branch]
+        items = api.get_paged("/project/#{repo.project_slug}/pipeline", query, max_pages: 1)
+        abort! 'No pipelines found.' if items.empty?
+
+        print_table items.map { |pipeline|
+          number = pipeline['number'].to_s
+          branch = pipeline.fetch('vcs', {})['branch'].to_s
+          actor  = pipeline.fetch('trigger', {}).fetch('actor', {})['login'].to_s
+          [number, branch, actor]
+        }
+      rescue ApiError => e
+        abort! e.message
+      end
+
       desc 'login', 'login to Circle CI'
       def login
         say LOGIN_HELP, :yellow
@@ -135,13 +166,21 @@ CircleCI token hasn't been configured. Run the following command to login:
         @project ||= Project.new(repo)
       end
 
+      def api
+        @api ||= ApiClient.new(token: repo.circle_token)
+      end
+
+      def validate_token!
+        abort! NO_TOKEN_MESSAGE unless repo.circle_token
+      end
+
       def latest
         project.latest
       end
 
       def validate_repo!
         abort! "Unsupported repo url format #{repo.uri}" unless repo.uri.github?
-        abort! NO_TOKEN_MESSAGE unless repo.circle_token
+        validate_token!
       end
 
       def validate_latest!
