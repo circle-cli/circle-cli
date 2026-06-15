@@ -99,7 +99,7 @@ CircleCI token hasn't been configured. Run the following command to login:
         Launchy.open url
       end
 
-      desc 'build', 'trigger a build on circle ci'
+      desc 'build', 'trigger a build on CircleCI'
       method_option :branch, desc: 'branch name'
       def build
         validate_repo!
@@ -271,7 +271,7 @@ CircleCI token hasn't been configured. Run the following command to login:
         abort! e.message
       end
 
-      desc 'login', 'login to Circle CI'
+      desc 'login', 'login to CircleCI'
       def login
         say LOGIN_HELP, :yellow
         ask set_color("\nPress [enter] to open CircleCI", :blue)
