@@ -27,6 +27,22 @@ module Circle
         request(Net::HTTP::Post, path, body: body)
       end
 
+      # Recent pipelines for a project slug ("vcs/org/repo"). Defaults to a
+      # single page since the dashboard only needs the newest handful.
+      def project_pipelines(slug, query = {}, max_pages: 1)
+        get_paged("/project/#{slug}/pipeline", query, max_pages: max_pages)
+      end
+
+      # Workflows belonging to a pipeline id.
+      def pipeline_workflows(pipeline_id, max_pages: 5)
+        get_paged("/pipeline/#{pipeline_id}/workflow", {}, max_pages: max_pages)
+      end
+
+      # Jobs belonging to a workflow id.
+      def workflow_jobs(workflow_id, max_pages: 5)
+        get_paged("/workflow/#{workflow_id}/job", {}, max_pages: max_pages)
+      end
+
       # Walks v2 pagination, concatenating each page's `items` array. Stops when
       # there is no next_page_token or after `max_pages` requests.
       def get_paged(path, query = {}, max_pages: 10)

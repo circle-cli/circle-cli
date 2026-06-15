@@ -68,6 +68,31 @@ module Circle::CLI
       end
     end
 
+    describe '#project_pipelines' do
+      it 'requests the project pipeline endpoint and returns the items' do
+        stub_request(:get, "#{base}/project/gh/o/r/pipeline")
+          .with(query: { 'branch' => 'main' })
+          .to_return(status: 200, body: { 'items' => [{ 'id' => 'p1' }], 'next_page_token' => nil }.to_json)
+        expect(client.project_pipelines('gh/o/r', { branch: 'main' }).map { |i| i['id'] }).to eq(['p1'])
+      end
+    end
+
+    describe '#pipeline_workflows' do
+      it 'requests the pipeline workflow endpoint and aggregates items' do
+        stub_request(:get, "#{base}/pipeline/p1/workflow")
+          .to_return(status: 200, body: { 'items' => [{ 'id' => 'w1' }], 'next_page_token' => nil }.to_json)
+        expect(client.pipeline_workflows('p1').map { |i| i['id'] }).to eq(['w1'])
+      end
+    end
+
+    describe '#workflow_jobs' do
+      it 'requests the workflow job endpoint and aggregates items' do
+        stub_request(:get, "#{base}/workflow/w1/job")
+          .to_return(status: 200, body: { 'items' => [{ 'id' => 'j1' }], 'next_page_token' => nil }.to_json)
+        expect(client.workflow_jobs('w1').map { |i| i['id'] }).to eq(['j1'])
+      end
+    end
+
     describe '#get_paged' do
       it 'follows next_page_token and aggregates the items arrays' do
         stub_request(:get, "#{base}/project/gh/o/r/pipeline")
