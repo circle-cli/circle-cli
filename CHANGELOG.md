@@ -11,13 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - CircleCI API v2 client foundation (`Circle::CLI::ApiClient`).
-- `circle me` and `circle pipelines` commands (API v2).
+- `circle me`, `circle projects`, `circle pipelines`, `circle workflows`, and
+  `circle jobs` commands (API v2).
 - Modern terminal pipeline dashboard (`circle dashboard`, with `--sample`).
 - CircleCI dogfood pipeline (`.circleci/config.yml`).
 - GitHub Pages documentation site under `docs/`.
 
 ### Changed
 - Require Ruby 3.3.
+- `circle status`, `circle overview`, and `circle open` now use the CircleCI API
+  v2 read-only pipeline/workflow/job model.
+- `circle token` now reports configured status/source by default instead of
+  printing the token value; use `circle token --show` to reveal it explicitly.
+- `circle login` validates saved tokens with `/me` without echoing the token.
 - Modernized gem packaging metadata: `documentation_uri`, `changelog_uri`,
   `allowed_push_host`, and `rubygems_mfa_required`.
 - Slimmed the published gem to runtime files only — specs, cassettes, the docs
