@@ -51,6 +51,14 @@ module Circle::CLI
     describe '#circle_token' do
       subject { repo.circle_token }
       specify { is_expected.to eq('123') }
+
+      context 'when git config has no token' do
+        before do
+          allow(git).to receive(:config).with('circleci.token').and_raise(Git::FailedError.allocate)
+        end
+
+        specify { is_expected.to be_nil }
+      end
     end
 
     describe '#circle_token=' do
@@ -80,6 +88,14 @@ module Circle::CLI
       end
 
       context 'falling back to inference from a github remote' do
+        specify { is_expected.to eq('gh/organization/repo') }
+      end
+
+      context 'when git config has no project slug' do
+        before do
+          allow(git).to receive(:config).with('circleci.project-slug').and_raise(Git::FailedError.allocate)
+        end
+
         specify { is_expected.to eq('gh/organization/repo') }
       end
 

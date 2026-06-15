@@ -33,7 +33,7 @@ module Circle
       end
 
       def circle_token
-        token = repo.config('circleci.token') || ENV['CIRCLE_CLI_TOKEN']
+        token = config_value('circleci.token') || ENV['CIRCLE_CLI_TOKEN']
         token if token && !token.empty?
       end
 
@@ -53,8 +53,14 @@ module Circle
       private
 
       def configured_slug
-        slug = repo.config('circleci.project-slug')
+        slug = config_value('circleci.project-slug')
         slug if slug && !slug.empty?
+      end
+
+      def config_value(name)
+        repo.config(name)
+      rescue Git::FailedError
+        nil
       end
 
       def inferred_slug
