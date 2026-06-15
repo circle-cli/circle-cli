@@ -1,0 +1,58 @@
+version: 2.1
+
+# Dogfood pipeline for circle-cli: lint-free build + test + smoke run of the
+# CLI itself. This config intentionally uses only unauthenticated commands, so
+# it never needs a CircleCI token or any context/secret to run.
+
+executors:
+  ruby-3-3:
+    docker:
+      - image: cimg/ruby:3.3
+    working_directory: ~/circle-cli
+
+jobs:
+  test:
+    executor: ruby-3-3
+    steps:
+      - checkout
+
+      # Cache bundled gems keyed on the gemspec (Gemfile.lock is git-ignored,
+      # so the gemspec is the most stable cache key available).
+      - restore_cache:
+          keys:
+            - v1-bundle-{{ checksum "circle-cli.gemspec" }}
+            - v1-bundle-
+
+      - run:
+          name: Install dependencies
+          command: |
+            bundle config set --local path vendor/bundle
+            bundle install --jobs=4 --retry=3
+
+      - save_cache:
+          key: v1-bundle-{{ checksum "circle-cli.gemspec" }}
+          paths:
+            - vendor/bundle
+
+      - run:
+          name: Run specs
+          command: bundle exec rake spec
+
+      - run:
+          name: Build gem
+          command: gem build circle-cli.gemspec
+
+      # Smoke test the CLI straight from the source tree. Both commands run
+      # without a token or network access to CircleCI.
+      - run:
+          name: Smoke test (help)
+          command: bundle exec ruby -Ilib bin/circle help
+
+      - run:
+          name: Smoke test (sample dashboard)
+          command: bundle exec ruby -Ilib bin/circle dashboard --sample --no-color --width 80
+
+workflows:
+  build-test:
+    jobs:
+      - test

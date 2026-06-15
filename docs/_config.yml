@@ -1,0 +1,23 @@
+# GitHub Pages (Jekyll) configuration for the circle-cli docs site.
+#
+# Publish settings: in the repository's Pages settings, choose
+# "Deploy from a branch" and point it at this `/docs` folder. No GitHub
+# Actions workflow is required — GitHub builds this Jekyll site for you.
+
+title: Circle CLI
+description: Command line tools for CircleCI, without leaving your terminal.
+theme: jekyll-theme-cayman
+
+# Used to build absolute links if/when the site is published under a project
+# path (https://<org>.github.io/circle-cli). Adjust if the repo is renamed.
+baseurl: "/circle-cli"
+
+# Keep the build lean and predictable.
+markdown: kramdown
+plugins:
+  - jekyll-relative-links
+
+exclude:
+  - vendor
+  - Gemfile
+  - Gemfile.lock

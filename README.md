@@ -78,11 +78,29 @@ Command line tools for Circle CI
   $ circle open
   ```
 
+- Preview the modern pipeline dashboard (no token needed)
+
+  ```
+  $ circle dashboard --sample
+  ```
+
 - For additional help
 
   ```
   $ circle help
   ```
+
+## Documentation
+
+Full documentation lives in the [`docs/`](docs/) folder and is published with
+GitHub Pages (Pages → Deploy from a branch → `/docs`):
+
+- [Quickstart](docs/quickstart.md)
+- [Commands](docs/commands.md)
+- [Configuration](docs/configuration.md)
+- [CI dogfood](docs/ci-dogfood.md)
+- [Migration & roadmap](docs/migration.md)
+- [Contributing](docs/contributing.md)
 
 ## Development
 
