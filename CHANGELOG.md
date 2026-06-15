@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-14
+
 ### Added
 - CircleCI API v2 client foundation (`Circle::CLI::ApiClient`).
 - `circle me` and `circle pipelines` commands (API v2).
@@ -16,8 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Require Ruby 3.3.
-- Modernized gem packaging metadata: `homepage_uri`, `documentation_uri`,
-  `changelog_uri`, `allowed_push_host`, and `rubygems_mfa_required`.
+- Modernized gem packaging metadata: `documentation_uri`, `changelog_uri`,
+  `allowed_push_host`, and `rubygems_mfa_required`.
 - Slimmed the published gem to runtime files only — specs, cassettes, the docs
   site, CI config, and dev dotfiles are no longer shipped in the package.
 
