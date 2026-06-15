@@ -20,6 +20,17 @@ module Circle::CLI
       allow(repo).to receive(:repo).and_return(git)
     end
 
+    # Token env vars take precedence over git config, so clear them for every
+    # example and let individual specs set them explicitly.
+    around do |example|
+      saved = ENV.values_at('CIRCLE_TOKEN', 'CIRCLE_CLI_TOKEN')
+      ENV.delete('CIRCLE_TOKEN')
+      ENV.delete('CIRCLE_CLI_TOKEN')
+      example.run
+    ensure
+      ENV['CIRCLE_TOKEN'], ENV['CIRCLE_CLI_TOKEN'] = saved
+    end
+
     describe '#uri' do
       subject { repo.uri }
       specify { is_expected.to be_github }
@@ -57,6 +68,42 @@ module Circle::CLI
           allow(git).to receive(:config).with('circleci.token').and_raise(Git::FailedError.allocate)
         end
 
+        specify { is_expected.to be_nil }
+      end
+
+      context 'precedence' do
+        before do
+          ENV['CIRCLE_TOKEN'] = 'env-primary'
+          ENV['CIRCLE_CLI_TOKEN'] = 'env-secondary'
+        end
+
+        specify 'CIRCLE_TOKEN wins over everything' do
+          is_expected.to eq('env-primary')
+        end
+
+        context 'when CIRCLE_TOKEN is absent' do
+          before { ENV.delete('CIRCLE_TOKEN') }
+          specify 'CIRCLE_CLI_TOKEN wins over git config' do
+            is_expected.to eq('env-secondary')
+          end
+        end
+      end
+    end
+
+    describe '#circle_token_source' do
+      subject { repo.circle_token_source }
+
+      specify 'names the git config source' do
+        is_expected.to match(/git config/)
+      end
+
+      context 'when the token comes from CIRCLE_TOKEN' do
+        before { ENV['CIRCLE_TOKEN'] = 'env-primary' }
+        specify { is_expected.to match(/CIRCLE_TOKEN/) }
+      end
+
+      context 'when no token is configured' do
+        let(:repo_config) { {} }
         specify { is_expected.to be_nil }
       end
     end

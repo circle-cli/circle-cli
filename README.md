@@ -20,10 +20,33 @@ Command line tools for Circle CI
 2. Add your CircleCI token
 
   ```
+  $ circle login          # guided: opens CircleCI, saves the token, validates it
+  # or, non-interactively:
   $ circle token <your token>
   ```
 
+  The token is read from the first of these that is set, in order:
+
+  1. `CIRCLE_TOKEN` environment variable
+  2. `CIRCLE_CLI_TOKEN` environment variable
+  3. `circleci.token` in git config (where `circle token <value>` and
+     `circle login` save it)
+
 ## Usage
+
+- Check whether a token is configured (the value is never printed)
+
+  ```
+  $ circle token          # reports status and source, not the secret
+  $ circle token --show   # prints the token value (use with care)
+  ```
+
+- Discover the current project slug and the projects your token can access
+
+  ```
+  $ circle projects          # human-readable table
+  $ circle projects --json   # machine-readable
+  ```
 
 - Get the CI status for the HEAD of your current branch
 

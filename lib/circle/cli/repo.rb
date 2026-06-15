@@ -32,11 +32,21 @@ module Circle
         options.fetch('branch') { repo.current_branch }
       end
 
+      # Active CircleCI token, or nil. Resolution precedence (the value itself
+      # is never logged): 1. CIRCLE_TOKEN env, 2. CIRCLE_CLI_TOKEN env,
+      # 3. git config circleci.token.
       def circle_token
-        token = config_value('circleci.token') || ENV['CIRCLE_CLI_TOKEN']
-        token if token && !token.empty?
+        resolved_token&.fetch(:value)
       end
 
+      # Human-readable description of where the active token came from, or nil
+      # when no token is configured. Never contains the token value itself.
+      def circle_token_source
+        resolved_token&.fetch(:source)
+      end
+
+      # Persists the token to git config. Storage location is unchanged for
+      # backwards compatibility with existing setups.
       def circle_token=(token)
         repo.config('circleci.token', token)
       end
@@ -51,6 +61,24 @@ module Circle
       end
 
       private
+
+      # Returns { source:, value: } for the first configured token in
+      # precedence order, or nil. Keeps source and value together so callers
+      # can report provenance without re-resolving.
+      def resolved_token
+        token_candidates.each do |source, value|
+          return { source: source, value: value } if value && !value.empty?
+        end
+        nil
+      end
+
+      def token_candidates
+        [
+          ['CIRCLE_TOKEN environment variable',     ENV['CIRCLE_TOKEN']],
+          ['CIRCLE_CLI_TOKEN environment variable', ENV['CIRCLE_CLI_TOKEN']],
+          ['git config (circleci.token)',           config_value('circleci.token')]
+        ]
+      end
 
       def configured_slug
         slug = config_value('circleci.project-slug')

@@ -1,4 +1,5 @@
 require 'io/console'
+require 'json'
 require 'launchy'
 require 'thor'
 require 'circle/cli/repo'
@@ -145,12 +146,17 @@ CircleCI token hasn't been configured. Run the following command to login:
         invoke :dashboard, [], options
       end
 
-      desc 'token', 'view or edit CircleCI token'
+      desc 'token [VALUE]', 'save a CircleCI token, or report token status'
+      method_option :show, type: :boolean, default: false,
+                           desc: 'print the configured token value (handle with care)'
       def token(value = nil)
         if value
           repo.circle_token = value
-        elsif value = repo.circle_token
-          say value
+          say 'Your CircleCI token has been saved.', :green
+        elsif options[:show]
+          print_token_value
+        elsif repo.circle_token
+          say "A CircleCI token is configured (source: #{repo.circle_token_source}).", :green
         else
           say NO_TOKEN_MESSAGE, :yellow
         end
@@ -184,14 +190,42 @@ CircleCI token hasn't been configured. Run the following command to login:
         abort! e.message
       end
 
+      desc 'projects', 'discover the current project slug and your collaborations (API v2)'
+      method_option :json, type: :boolean, default: false,
+                           desc: 'emit JSON instead of a human-readable table'
+      def projects
+        validate_token!
+        slug = repo.project_slug
+        collaborations = Array(api.get('/me/collaborations'))
+
+        if options[:json]
+          say JSON.generate(current_project_slug: slug, collaborations: collaborations)
+          return
+        end
+
+        say "Current repo project slug: #{slug}", :cyan
+        if collaborations.empty?
+          say "\nNo collaborations found for this token."
+        else
+          say "\nCollaborations:", :bold
+          print_table collaborations.map { |collab|
+            [collab['name'].to_s, collab['vcs-type'].to_s, collab['slug'].to_s]
+          }
+        end
+      rescue ApiError => e
+        abort! e.message
+      end
+
       desc 'login', 'login to Circle CI'
       def login
         say LOGIN_HELP, :yellow
         ask set_color("\nPress [enter] to open CircleCI", :blue)
         Launchy.open(CIRCLE_URL)
-        value = ask set_color('Enter your token:', :blue)
+        value = ask set_color('Enter your token:', :blue), echo: false
+        abort! 'No token was entered.' if value.nil? || value.strip.empty?
         repo.circle_token = value
-        say "\nYour token has been set to '#{value}'.", :green
+        say "\nYour CircleCI token has been saved.", :green
+        announce_identity(value)
       end
 
       private
@@ -210,6 +244,24 @@ CircleCI token hasn't been configured. Run the following command to login:
 
       def validate_token!
         abort! NO_TOKEN_MESSAGE unless repo.circle_token
+      end
+
+      def print_token_value
+        if (value = repo.circle_token)
+          say value
+        else
+          say NO_TOKEN_MESSAGE, :yellow
+        end
+      end
+
+      # Confirms a freshly saved token against /me and prints the user identity.
+      # Never echoes the token; a validation failure is a soft warning since the
+      # token is already stored.
+      def announce_identity(token)
+        user = ApiClient.new(token: token).get('/me')
+        say "Logged in as #{user['name'] || user['login']}.", :green
+      rescue ApiError => e
+        say "Token saved, but it could not be validated: #{e.message}", :yellow
       end
 
       def latest
