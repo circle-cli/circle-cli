@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'git', '>= 1.3', '< 3.0'
   spec.add_dependency 'gitable', '>= 0.4', '< 1.0'
   spec.add_dependency 'launchy', '>= 2.4', '< 4.0'
+  spec.add_dependency 'pastel', '>= 0.8', '< 1.0'
   spec.add_dependency 'thor', '>= 0.19', '< 2.0'
 
   spec.add_development_dependency 'rake', '>= 12.0'
