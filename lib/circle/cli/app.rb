@@ -1,5 +1,6 @@
 require 'io/console'
 require 'json'
+require 'time'
 require 'launchy'
 require 'thor'
 require 'circle/cli/repo'
@@ -120,18 +121,28 @@ CircleCI token hasn't been configured. Run the following command to login:
                               desc: 'enable unicode icons and box drawing'
       method_option :width, type: :numeric,
                             desc: 'override terminal width for rendering'
+      method_option :branch, desc: 'limit live pipelines to a branch'
       def dashboard
-        data = TUI::DataSource.for(
-          sample: options[:sample],
-          project: (project unless options[:sample])
-        ).dashboard
+        source =
+          if options[:sample]
+            TUI::DataSource.for(sample: true)
+          else
+            validate_token!
+            TUI::DataSource.for(
+              sample: false,
+              api: api,
+              project_slug: repo.project_slug,
+              branch: options[:branch]
+            )
+          end
+
         say TUI::DashboardRenderer.new(
-          data,
+          source.dashboard,
           color: options[:color],
           unicode: options[:unicode],
           width: dashboard_width
         ).render
-      rescue TUI::PendingIntegration => e
+      rescue ApiError => e
         abort! e.message
       rescue StandardError => e
         abort! "Unable to load dashboard data: #{e.message}"
@@ -142,6 +153,7 @@ CircleCI token hasn't been configured. Run the following command to login:
       method_option :color, type: :boolean, default: true
       method_option :unicode, type: :boolean, default: true
       method_option :width, type: :numeric
+      method_option :branch, desc: 'limit live pipelines to a branch'
       def tui
         invoke :dashboard, [], options
       end
@@ -216,6 +228,43 @@ CircleCI token hasn't been configured. Run the following command to login:
         abort! e.message
       end
 
+      desc 'workflows PIPELINE_ID', 'list workflows for a pipeline (API v2)'
+      def workflows(pipeline_id)
+        validate_token!
+        items = api.pipeline_workflows(pipeline_id)
+        abort! 'No workflows found.' if items.empty?
+
+        print_table items.map { |workflow|
+          [
+            workflow['name'].to_s,
+            workflow['status'].to_s,
+            workflow['id'].to_s,
+            workflow['created_at'].to_s
+          ]
+        }
+      rescue ApiError => e
+        abort! e.message
+      end
+
+      desc 'jobs WORKFLOW_ID', 'list jobs for a workflow (API v2)'
+      def jobs(workflow_id)
+        validate_token!
+        items = api.workflow_jobs(workflow_id)
+        abort! 'No jobs found.' if items.empty?
+
+        print_table items.map { |job|
+          [
+            job['name'].to_s,
+            job['status'].to_s,
+            job['job_number'].to_s,
+            job['id'].to_s,
+            job_duration(job)
+          ]
+        }
+      rescue ApiError => e
+        abort! e.message
+      end
+
       desc 'login', 'login to Circle CI'
       def login
         say LOGIN_HELP, :yellow
@@ -266,6 +315,27 @@ CircleCI token hasn't been configured. Run the following command to login:
 
       def latest
         project.latest
+      end
+
+      # Human-readable run time for a v2 job, derived from its start/stop
+      # timestamps. Returns '-' when the job has not produced both yet.
+      def job_duration(job)
+        started = job['started_at']
+        stopped = job['stopped_at']
+        return '-' unless started && stopped
+
+        seconds = (Time.parse(stopped) - Time.parse(started)).to_i
+        return '-' if seconds.negative?
+
+        minutes, secs = seconds.divmod(60)
+        hours, minutes = minutes.divmod(60)
+        parts = []
+        parts << "#{hours}h" unless hours.zero?
+        parts << "#{minutes}m" unless minutes.zero?
+        parts << "#{secs}s" if parts.empty? || !secs.zero?
+        parts.join(' ')
+      rescue ArgumentError, TypeError
+        '-'
       end
 
       def dashboard_width

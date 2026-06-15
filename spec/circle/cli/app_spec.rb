@@ -161,5 +161,66 @@ module Circle::CLI
         expect { app.pipelines }.to raise_error(SystemExit)
       end
     end
+
+    describe '#workflows' do
+      it 'lists workflow name, status, id, and created time' do
+        stub_request(:get, "#{base}/pipeline/p1/workflow")
+          .to_return(
+            status: 200,
+            body: {
+              'items' => [
+                { 'id' => 'w1', 'name' => 'build-test', 'status' => 'success',
+                  'created_at' => '2026-06-14T18:00:00Z' }
+              ],
+              'next_page_token' => nil
+            }.to_json
+          )
+        expect { app.workflows('p1') }.to output(/build-test.*success.*w1/m).to_stdout
+      end
+
+      it 'aborts when there are no workflows' do
+        stub_request(:get, "#{base}/pipeline/p1/workflow")
+          .to_return(status: 200, body: { 'items' => [], 'next_page_token' => nil }.to_json)
+        expect { app.workflows('p1') }.to raise_error(SystemExit)
+      end
+    end
+
+    describe '#jobs' do
+      it 'lists job name, status, number, id, and duration' do
+        stub_request(:get, "#{base}/workflow/w1/job")
+          .to_return(
+            status: 200,
+            body: {
+              'items' => [
+                { 'id' => 'j1', 'name' => 'rspec', 'status' => 'success', 'job_number' => 9,
+                  'started_at' => '2026-06-14T18:00:00Z', 'stopped_at' => '2026-06-14T18:00:45Z' }
+              ],
+              'next_page_token' => nil
+            }.to_json
+          )
+        expect { app.jobs('w1') }.to output(/rspec.*success.*45s/m).to_stdout
+      end
+
+      it 'shows a dash when a job has no duration yet' do
+        stub_request(:get, "#{base}/workflow/w1/job")
+          .to_return(
+            status: 200,
+            body: {
+              'items' => [
+                { 'id' => 'j1', 'name' => 'deploy', 'status' => 'running', 'job_number' => 10,
+                  'started_at' => '2026-06-14T18:00:00Z' }
+              ],
+              'next_page_token' => nil
+            }.to_json
+          )
+        expect { app.jobs('w1') }.to output(/deploy.*running/m).to_stdout
+      end
+
+      it 'aborts when there are no jobs' do
+        stub_request(:get, "#{base}/workflow/w1/job")
+          .to_return(status: 200, body: { 'items' => [], 'next_page_token' => nil }.to_json)
+        expect { app.jobs('w1') }.to raise_error(SystemExit)
+      end
+    end
   end
 end

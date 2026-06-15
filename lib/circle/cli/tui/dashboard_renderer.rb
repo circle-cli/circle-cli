@@ -34,10 +34,12 @@ module Circle
         def render
           lines = header_lines
           pipelines = @data[:pipelines] || []
+          notice = @data[:notice]
           if pipelines.empty?
-            lines << compose([['No recent pipelines.', :bright_black]], indent: 2)
+            lines << compose([[notice || 'No recent pipelines.', :bright_black]], indent: 2)
           else
             pipelines.each { |pipeline| lines.concat(pipeline_lines(pipeline)) }
+            lines << compose([[notice, :bright_black]], indent: 2) if notice
           end
           lines.join("\n")
         end
@@ -94,8 +96,11 @@ module Circle
             lines << compose([[meta.compact.join('  ·  '), :bright_black]], indent: 2)
           end
 
-          (pipeline[:workflows] || []).each do |workflow|
-            lines.concat(workflow_lines(workflow))
+          workflows = pipeline[:workflows] || []
+          if workflows.empty?
+            lines << compose([['No workflows.', :bright_black]], indent: 2)
+          else
+            workflows.each { |workflow| lines.concat(workflow_lines(workflow)) }
           end
           lines
         end
@@ -114,7 +119,11 @@ module Circle
             [job_summary(jobs), :bright_black]
           ], indent: 2)]
 
-          jobs.each { |job| lines << job_line(job) }
+          if jobs.empty?
+            lines << compose([['No jobs.', :bright_black]], indent: 6)
+          else
+            jobs.each { |job| lines << job_line(job) }
+          end
           lines
         end
 
