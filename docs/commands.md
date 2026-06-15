@@ -33,7 +33,14 @@ $ circle --watch
 $ circle status --branch main
 ```
 
-Exits non-zero when the build has failed, which makes it usable in scripts.
+Reads the latest pipeline for the branch from the CircleCI API v2 (its newest
+workflow and that workflow's jobs), so it requires a configured token. It shows
+the commit subject, rolled-up status, timestamps, the workflow's web URL, each
+job, and any failing specs reported by failed jobs.
+
+Exits non-zero when the run failed, was canceled, or errored, and exits zero on
+a successful terminal run, which makes it usable in scripts. While a run is
+still in progress it neither exits nor reports failure.
 
 ## watch
 
@@ -41,7 +48,8 @@ Exits non-zero when the build has failed, which makes it usable in scripts.
 
 ## overview
 
-`circle overview` — list recent builds and their statuses across all branches.
+`circle overview` — list recent pipelines and their rolled-up statuses across
+all branches, read from the CircleCI API v2. Requires a configured token.
 
 | Option | Default | Description |
 | --- | --- | --- |
@@ -67,7 +75,10 @@ start watching its status.
 
 ## open
 
-`circle open` — open the latest build's results page in your browser.
+`circle open` — open the latest pipeline's results page in your browser. It
+opens the newest workflow's page on app.circleci.com (falling back to the
+pipeline page when no workflow is available), resolved via the API v2. Requires
+a configured token.
 
 | Option | Default | Description |
 | --- | --- | --- |

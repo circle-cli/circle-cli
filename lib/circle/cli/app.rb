@@ -8,6 +8,7 @@ require 'circle/cli/project'
 require 'circle/cli/watcher'
 require 'circle/cli/api_client'
 require 'circle/cli/api_error'
+require 'circle/cli/pipeline_source'
 require 'circle/cli/tui/dashboard_renderer'
 require 'circle/cli/tui/data_source'
 
@@ -39,15 +40,16 @@ CircleCI token hasn't been configured. Run the following command to login:
       method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
       def status
         validate_repo!
-        validate_latest!
+        source = pipeline_source
+        abort! 'No CircleCI builds found.' unless source.latest
 
         watcher = Watcher.new do
-          display_status
+          display_status(source.latest)
         end
 
         watcher.to_preload do
-          project.clear_cache!
-          project.latest.preload
+          source.clear_cache!
+          source.latest&.preload
         end
 
         if options[:watch]
@@ -67,15 +69,16 @@ CircleCI token hasn't been configured. Run the following command to login:
       method_option :poll, default: 5, desc: 'polling frequency', type: :numeric
       def overview
         validate_repo!
-        abort! 'No recent builds.' if project.recent_builds.empty?
+        source = pipeline_source
+        abort! 'No recent builds.' if source.recent_builds.empty?
 
         watcher = Watcher.new do
-          display_builds(project.recent_builds)
+          display_builds(source.recent_builds)
         end
 
         watcher.to_preload do
-          project.clear_cache!
-          project.recent_builds
+          source.clear_cache!
+          source.recent_builds
         end
 
         if options[:watch]
@@ -89,8 +92,11 @@ CircleCI token hasn't been configured. Run the following command to login:
       method_option :branch, desc: 'branch name'
       def open
         validate_repo!
-        validate_latest!
-        Launchy.open latest[:build_url]
+        build = pipeline_source.latest
+        abort! 'No CircleCI builds found.' unless build
+        url = build[:build_url]
+        abort! 'No CircleCI web URL is available for the latest pipeline.' unless url
+        Launchy.open url
       end
 
       desc 'build', 'trigger a build on circle ci'
@@ -291,6 +297,16 @@ CircleCI token hasn't been configured. Run the following command to login:
         @api ||= ApiClient.new(token: repo.circle_token)
       end
 
+      # v2-backed read-only data source for status/overview/open. `latest` is
+      # scoped to the resolved branch; `recent_builds` spans all branches.
+      def pipeline_source
+        @pipeline_source ||= PipelineSource.new(
+          api: api,
+          project_slug: repo.project_slug,
+          branch: repo.branch_name
+        )
+      end
+
       def validate_token!
         abort! NO_TOKEN_MESSAGE unless repo.circle_token
       end
@@ -363,16 +379,17 @@ CircleCI token hasn't been configured. Run the following command to login:
         say "#{status} #{result}"
       end
 
-      def display_status
-        say "#{latest[:subject]}\n\n", :cyan if latest[:subject]
-        display 'Build status', latest.status, latest.color
-        display 'Started at', latest.formatted_start_time, latest.color
-        display 'Finished at', latest.formatted_stop_time, latest.color
-        display 'Compare', latest[:compare], latest.color if latest[:compare]
-        display_steps latest.steps unless latest.steps.empty?
-        display_failures latest.failing_tests unless latest.failing_tests.empty?
-        exit 1 if latest.failed?
-        exit 0 if latest.finished?
+      def display_status(build)
+        say "#{build[:subject]}\n\n", :cyan if build[:subject]
+        display 'Build status', build.status, build.color
+        display 'Started at', build.formatted_start_time, build.color
+        display 'Finished at', build.formatted_stop_time, build.color
+        display 'URL', build[:build_url], build.color if build[:build_url]
+        display 'Compare', build[:compare], build.color if build[:compare]
+        display_steps build.steps unless build.steps.empty?
+        display_failures build.failing_tests unless build.failing_tests.empty?
+        exit 1 if build.failed?
+        exit 0 if build.finished?
       end
 
       def display_steps(steps)

@@ -19,12 +19,17 @@ work-in-progress.
 - **New v2 commands** were introduced: `circle me` and `circle pipelines`.
 - **A modern terminal dashboard** (`circle dashboard`) renders pipelines,
   workflows, and jobs.
+- **The read-only classic commands moved to API v2.** `circle status`,
+  `circle overview`, and `circle open` now read pipelines, workflows, and jobs
+  from the v2 API instead of the legacy v1 gem. `build` and `cancel` still use
+  v1 (mutations are intentionally left untouched).
 
 ## Status at a glance
 
 | Area | Status |
 | --- | --- |
-| `status`, `build`, `cancel`, `open`, `overview` (v1) | Working |
+| `status`, `overview`, `open` (v2) | Working (require a token) |
+| `build`, `cancel` (v1) | Working |
 | `token`, `login` | Working |
 | `me`, `projects`, `pipelines`, `workflows`, `jobs` (v2) | Working (require a token) |
 | `dashboard --sample` | Working |
@@ -42,8 +47,8 @@ dashboard renders a friendly empty state.
 
 ## Roadmap
 
-- Migrate the remaining v1-based commands (`status`, `overview`, `build`,
-  `cancel`) onto the v2 pipeline/workflow/job model.
+- Migrate the remaining v1-based commands (`build`, `cancel`) onto the v2
+  pipeline/workflow/job model once the mutation semantics are settled.
 - Broaden VCS support beyond GitHub for the classic commands.
 - CI matrix across multiple Ruby versions (see [CI dogfood](ci-dogfood.md)).
 

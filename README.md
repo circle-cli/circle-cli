@@ -34,6 +34,9 @@ Command line tools for Circle CI
 
 ## Usage
 
+> The read-only commands `circle status`, `circle overview`, and `circle open`
+> now read from the CircleCI API v2 and require a configured token (see Setup).
+
 - Check whether a token is configured (the value is never printed)
 
   ```

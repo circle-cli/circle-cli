@@ -6,7 +6,7 @@ module Circle::CLI
     let(:options) { {} }
     let(:app)     { described_class.new([], options) }
     let(:repo) do
-      instance_double Repo, circle_token: 'tok', project_slug: 'gh/o/r'
+      instance_double Repo, circle_token: 'tok', project_slug: 'gh/o/r', branch_name: 'master'
     end
     let(:base) { 'https://circleci.com/api/v2' }
 
@@ -220,6 +220,134 @@ module Circle::CLI
         stub_request(:get, "#{base}/workflow/w1/job")
           .to_return(status: 200, body: { 'items' => [], 'next_page_token' => nil }.to_json)
         expect { app.jobs('w1') }.to raise_error(SystemExit)
+      end
+    end
+
+    # The v1-migrated read-only commands. validate_repo! is stubbed so these
+    # focus on v2 behavior rather than git remote/VCS resolution.
+    describe 'v2-backed read-only commands' do
+      before { allow(app).to receive(:validate_repo!) }
+
+      def stub_branch_pipelines(items)
+        stub_request(:get, "#{base}/project/gh/o/r/pipeline")
+          .with(query: { 'branch' => 'master' })
+          .to_return(status: 200, body: { 'items' => items, 'next_page_token' => nil }.to_json)
+      end
+
+      def stub_all_pipelines(items)
+        stub_request(:get, "#{base}/project/gh/o/r/pipeline")
+          .to_return(status: 200, body: { 'items' => items, 'next_page_token' => nil }.to_json)
+      end
+
+      def stub_workflows(pipeline_id, items)
+        stub_request(:get, "#{base}/pipeline/#{pipeline_id}/workflow")
+          .to_return(status: 200, body: { 'items' => items, 'next_page_token' => nil }.to_json)
+      end
+
+      def stub_jobs(workflow_id, items)
+        stub_request(:get, "#{base}/workflow/#{workflow_id}/job")
+          .to_return(status: 200, body: { 'items' => items, 'next_page_token' => nil }.to_json)
+      end
+
+      def silence_exit
+        yield
+      rescue SystemExit
+        nil
+      end
+
+      describe '#status' do
+        it 'renders subject, status, URL, and steps from v2 data' do
+          stub_branch_pipelines([{ 'id' => 'p1', 'number' => 12,
+            'vcs' => { 'branch' => 'master', 'commit' => { 'subject' => 'Ship it' } } }])
+          stub_workflows('p1', [{ 'id' => 'w1', 'status' => 'success',
+            'created_at' => '2026-06-14T18:00:00Z', 'stopped_at' => '2026-06-14T18:02:00Z' }])
+          stub_jobs('w1', [{ 'name' => 'rspec', 'status' => 'success', 'job_number' => 9,
+            'started_at' => '2026-06-14T18:00:00Z', 'stopped_at' => '2026-06-14T18:00:45Z' }])
+
+          expect { silence_exit { app.status } }
+            .to output(satisfy { |o|
+              o.include?('Ship it') && o.include?('Success') && o.include?('rspec') &&
+                o.include?('app.circleci.com/pipelines/github/o/r/12/workflows/w1')
+            }).to_stdout
+        end
+
+        it 'exits 0 on a successful terminal pipeline' do
+          stub_branch_pipelines([{ 'id' => 'p1', 'number' => 1, 'vcs' => { 'branch' => 'master' } }])
+          stub_workflows('p1', [{ 'id' => 'w1', 'status' => 'success' }])
+          stub_jobs('w1', [])
+          expect { app.status }.to raise_error(SystemExit) { |e| expect(e.status).to eq(0) }
+        end
+
+        it 'exits 1 and lists failing specs on a failed pipeline' do
+          stub_branch_pipelines([{ 'id' => 'p1', 'number' => 1, 'vcs' => { 'branch' => 'master' } }])
+          stub_workflows('p1', [{ 'id' => 'w1', 'status' => 'failed' }])
+          stub_jobs('w1', [{ 'name' => 'rspec', 'status' => 'failed', 'job_number' => 9 }])
+          stub_request(:get, "#{base}/project/gh/o/r/9/tests")
+            .to_return(status: 200, body: { 'items' => [
+              { 'name' => 'is broken', 'file' => 'spec/x_spec.rb', 'result' => 'failure' }
+            ], 'next_page_token' => nil }.to_json)
+
+          expect { silence_exit { app.status } }.to output(/is broken/).to_stdout
+          expect { app.status }.to raise_error(SystemExit) { |e| expect(e.status).to eq(1) }
+        end
+
+        it 'exits 1 on a canceled pipeline' do
+          stub_branch_pipelines([{ 'id' => 'p1', 'number' => 1, 'vcs' => { 'branch' => 'master' } }])
+          stub_workflows('p1', [{ 'id' => 'w1', 'status' => 'canceled' }])
+          stub_jobs('w1', [])
+          expect { app.status }.to raise_error(SystemExit) { |e| expect(e.status).to eq(1) }
+        end
+
+        it 'does not exit while a pipeline is still running' do
+          stub_branch_pipelines([{ 'id' => 'p1', 'number' => 1, 'vcs' => { 'branch' => 'master' } }])
+          stub_workflows('p1', [{ 'id' => 'w1', 'status' => 'running' }])
+          stub_jobs('w1', [{ 'name' => 'rspec', 'status' => 'running', 'job_number' => 9 }])
+          expect { app.status }.not_to raise_error
+        end
+
+        it 'aborts when the branch has no pipelines' do
+          stub_branch_pipelines([])
+          expect { app.status }.to raise_error(SystemExit)
+        end
+      end
+
+      describe '#overview' do
+        it 'lists recent pipelines across branches' do
+          stub_all_pipelines([
+            { 'id' => 'p1', 'number' => 2, 'vcs' => { 'branch' => 'main', 'commit' => { 'subject' => 'A' } } },
+            { 'id' => 'p2', 'number' => 1, 'vcs' => { 'branch' => 'topic', 'commit' => { 'subject' => 'B' } } }
+          ])
+          stub_workflows('p1', [{ 'id' => 'w1', 'status' => 'success' }])
+          stub_workflows('p2', [{ 'id' => 'w2', 'status' => 'failed' }])
+
+          expect { app.overview }
+            .to output(satisfy { |o| o.include?('main') && o.include?('topic') && o.include?('Failed') })
+            .to_stdout
+        end
+
+        it 'aborts when there are no recent pipelines' do
+          stub_all_pipelines([])
+          expect { app.overview }.to raise_error(SystemExit)
+        end
+      end
+
+      describe '#open' do
+        before { allow(Launchy).to receive(:open) }
+
+        it 'opens the workflow web URL for the latest pipeline' do
+          stub_branch_pipelines([{ 'id' => 'p1', 'number' => 12, 'vcs' => { 'branch' => 'master' } }])
+          stub_workflows('p1', [{ 'id' => 'w1', 'status' => 'success' }])
+          stub_jobs('w1', [])
+          app.open
+          expect(Launchy).to have_received(:open)
+            .with('https://app.circleci.com/pipelines/github/o/r/12/workflows/w1')
+        end
+
+        it 'aborts when there is no pipeline to open' do
+          stub_branch_pipelines([])
+          expect { app.open }.to raise_error(SystemExit)
+          expect(Launchy).not_to have_received(:open)
+        end
       end
     end
   end

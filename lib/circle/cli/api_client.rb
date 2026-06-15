@@ -43,6 +43,12 @@ module Circle
         get_paged("/workflow/#{workflow_id}/job", {}, max_pages: max_pages)
       end
 
+      # Test results for a finished job, addressed by project slug and the
+      # project-scoped job number. Used to surface failing specs in status.
+      def job_tests(slug, job_number, max_pages: 5)
+        get_paged("/project/#{slug}/#{job_number}/tests", {}, max_pages: max_pages)
+      end
+
       # Walks v2 pagination, concatenating each page's `items` array. Stops when
       # there is no next_page_token or after `max_pages` requests.
       def get_paged(path, query = {}, max_pages: 10)
