@@ -8,9 +8,10 @@ title: Circle CLI
 description: Command line tools for CircleCI, without leaving your terminal.
 theme: jekyll-theme-cayman
 
-# Used to build absolute links if/when the site is published under a project
-# path (https://<org>.github.io/circle-cli). Adjust if the repo is renamed.
-baseurl: "/circle-cli"
+# Root-relative for a custom domain or organization/user GitHub Pages site.
+# If this is later published under a project path such as
+# https://<org>.github.io/circle-cli, set this back to "/circle-cli".
+baseurl: ""
 
 # Keep the build lean and predictable.
 markdown: kramdown
