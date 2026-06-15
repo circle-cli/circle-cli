@@ -84,15 +84,17 @@ terminal, showing pipelines, their workflows, and per-job status.
 | `--color` / `--no-color` | `true` | Toggle ANSI color output. |
 | `--unicode` / `--no-unicode` | `true` | Toggle unicode icons and box drawing. |
 | `--width=N` | terminal width | Override the render width (columns). |
+| `--branch=NAME` | all branches | Limit live pipelines to a branch. |
 
 ```
 $ circle dashboard --sample
 $ circle dashboard --sample --no-color --width 80
+$ circle dashboard --branch main
 ```
 
-> **Roadmap:** today only `--sample` produces output. The live data path
-> (reading real pipelines/workflows/jobs from the CircleCI API v2) is not wired
-> up yet and will report that it is pending. See [Migration](migration.md).
+Without `--sample`, the dashboard reads live CircleCI API v2 pipeline,
+workflow, and job data for the resolved project slug. It requires a configured
+token.
 
 ## tui
 
@@ -100,9 +102,11 @@ $ circle dashboard --sample --no-color --width 80
 
 ## token
 
-`circle token [VALUE]` — view or set the stored CircleCI token.
+`circle token [VALUE]` — save a CircleCI token, or report token status.
 
-- `circle token` prints the current token (or a hint to log in if none is set).
+- `circle token` reports whether a token is configured and where it came from;
+  it does **not** print the secret value.
+- `circle token --show` prints the token value explicitly. Use sparingly.
 - `circle token <value>` stores `<value>` in git config under `circleci.token`.
 
 For an interactive flow that opens CircleCI's token page, use `circle login`.
@@ -110,12 +114,24 @@ For an interactive flow that opens CircleCI's token page, use `circle login`.
 ## login
 
 `circle login` — interactive token setup. Opens the CircleCI token page,
-prompts you to paste a new token, and stores it.
+prompts you to paste a new token, stores it, and validates it with CircleCI
+without echoing the value.
 
 ## me
 
 `circle me` — show the current CircleCI user. Uses the API v2 `/me` endpoint and
 requires a configured token.
+
+> **New in the modernized CLI.**
+
+## projects
+
+`circle projects` — show the resolved project slug for the current repository
+and list collaborations visible to the token.
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--json` | `false` | Emit machine-readable JSON. |
 
 > **New in the modernized CLI.**
 
@@ -127,5 +143,19 @@ Requires a configured token.
 | Option | Default | Description |
 | --- | --- | --- |
 | `--branch=NAME` | all branches | Filter pipelines to a branch. |
+
+> **New in the modernized CLI.**
+
+## workflows
+
+`circle workflows PIPELINE_ID` — list workflows for a pipeline using the API v2.
+Requires a configured token.
+
+> **New in the modernized CLI.**
+
+## jobs
+
+`circle jobs WORKFLOW_ID` — list jobs for a workflow using the API v2. Requires a
+configured token.
 
 > **New in the modernized CLI.**

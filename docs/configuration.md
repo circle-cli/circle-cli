@@ -14,22 +14,29 @@ they belong to.
 Commands that talk to CircleCI need a personal API token. It is resolved in this
 order:
 
-1. Git config `circleci.token` (set by `circle login` or `circle token <value>`).
+1. The `CIRCLE_TOKEN` environment variable.
 2. The `CIRCLE_CLI_TOKEN` environment variable.
+3. Git config `circleci.token` (set by `circle login` or `circle token <value>`).
 
 ```
 # Stored in .git/config (local to this repo)
 $ circle token <your-token>
 
 # Or supply it via the environment (handy for CI/scripts)
+$ export CIRCLE_TOKEN=<your-token>
+# or
 $ export CIRCLE_CLI_TOKEN=<your-token>
 ```
 
 An empty value is treated as "not set". If no token is found, commands that need
 one print a hint to run `circle login`.
 
-> **Security:** never commit a token. Prefer `CIRCLE_CLI_TOKEN` in automated
-> environments and store it as a secret, not in source.
+`circle token` reports whether a token is configured without printing the value.
+Use `circle token --show` only when you explicitly need to reveal it.
+
+> **Security:** never commit a token. Prefer `CIRCLE_TOKEN` or
+> `CIRCLE_CLI_TOKEN` in automated environments and store it as a secret, not in
+> source.
 
 ## Project slug
 

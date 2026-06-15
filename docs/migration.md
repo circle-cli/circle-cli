@@ -26,24 +26,22 @@ work-in-progress.
 | --- | --- |
 | `status`, `build`, `cancel`, `open`, `overview` (v1) | Working |
 | `token`, `login` | Working |
-| `me`, `pipelines` (v2) | Working (require a token) |
+| `me`, `projects`, `pipelines`, `workflows`, `jobs` (v2) | Working (require a token) |
 | `dashboard --sample` | Working |
-| `dashboard` with live data | **Roadmap** — not wired up yet |
+| `dashboard` with live data | Working (requires a token) |
 
 ## Dashboard: sample vs live
 
 The dashboard ships now because its data source is behind an adapter seam. The
 `--sample` path renders bundled fixture data and works with no repo or token.
 
-The **live** path — reading real pipelines/workflows/jobs from the CircleCI
-v2 API and mapping them into the renderer's shape — is not implemented yet.
-Running `circle dashboard` without `--sample` will report that live data is
-pending and point you at `--sample`. This is intentional: it lets the renderer
-and command ship while the v2 data mapping is finished as a localized change.
+The **live** path reads real pipelines, workflows, and jobs from the CircleCI v2
+API and maps them into the renderer's shape. It requires a configured token and
+project slug. If CircleCI has no pipelines for the resolved project, the
+dashboard renders a friendly empty state.
 
 ## Roadmap
 
-- Wire the live dashboard data source to the v2 API.
 - Migrate the remaining v1-based commands (`status`, `overview`, `build`,
   `cancel`) onto the v2 pipeline/workflow/job model.
 - Broaden VCS support beyond GitHub for the classic commands.

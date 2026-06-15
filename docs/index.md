@@ -27,9 +27,9 @@ $ circle
 
 This is an actively modernizing project. The classic v1-based commands
 (`status`, `build`, `cancel`, `open`, `overview`) work today. Newer API v2
-commands (`me`, `pipelines`) and the `dashboard` TUI are landing
-incrementally — see the [migration notes](migration.md) for what is finished
-versus on the roadmap.
+commands (`me`, `projects`, `pipelines`, `workflows`, `jobs`) and the live
+`dashboard` TUI are landing incrementally — see the
+[migration notes](migration.md) for what is finished versus on the roadmap.
 
 The source for this site lives in the [`docs/` folder of the
 repository](https://github.com/circle-cli/circle-cli/tree/master/docs).
