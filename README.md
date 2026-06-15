@@ -1,5 +1,5 @@
 # Circle CLI
-Command line tools for Circle CI
+Command line tools for CircleCI
 
 [![Gem Version](https://badge.fury.io/rb/circle-cli.svg)](https://badge.fury.io/rb/circle-cli)
 
