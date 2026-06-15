@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata = {
     'source_code_uri'       => spec.homepage,
-    'documentation_uri'     => "#{spec.homepage}/tree/master/docs",
+    'documentation_uri'     => 'https://circle-cli.github.io/circle-cli/',
     'changelog_uri'         => "#{spec.homepage}/blob/master/CHANGELOG.md",
     'bug_tracker_uri'       => "#{spec.homepage}/issues",
     'allowed_push_host'     => 'https://rubygems.org',

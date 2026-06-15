@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Require Ruby 3.3.
+- RubyGems documentation metadata now points at the live GitHub Pages site.
 - `circle status`, `circle overview`, and `circle open` now use the CircleCI API
   v2 read-only pipeline/workflow/job model.
 - `circle token` now reports configured status/source by default instead of

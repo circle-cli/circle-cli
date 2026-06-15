@@ -25,11 +25,12 @@ $ circle
 
 ## Status
 
-This is an actively modernizing project. The classic v1-based commands
-(`status`, `build`, `cancel`, `open`, `overview`) work today. Newer API v2
-commands (`me`, `projects`, `pipelines`, `workflows`, `jobs`) and the live
-`dashboard` TUI are landing incrementally — see the
-[migration notes](migration.md) for what is finished versus on the roadmap.
+This is an actively modernizing project. Most read-only commands now use the
+CircleCI API v2 (`status`, `overview`, `open`, `me`, `projects`, `pipelines`,
+`workflows`, `jobs`, and the live `dashboard` TUI). The classic mutation
+commands (`build`, `cancel`) remain on the legacy API while their API v2
+semantics are evaluated — see the [migration notes](migration.md) for what is
+finished versus on the roadmap.
 
 The source for this site lives in the [`docs/` folder of the
 repository](https://github.com/circle-cli/circle-cli/tree/master/docs).

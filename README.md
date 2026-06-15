@@ -95,8 +95,9 @@ Command line tools for CircleCI
 
 ## Documentation
 
-Full documentation lives in the [`docs/`](docs/) folder and is published with
-GitHub Pages (Pages → Deploy from a branch → `/docs`):
+Full documentation lives in the [`docs/`](docs/) folder and is published at
+<https://circle-cli.github.io/circle-cli/> with GitHub Pages (Pages → Deploy
+from a branch → `/docs`):
 
 - [Quickstart](docs/quickstart.md)
 - [Commands](docs/commands.md)
